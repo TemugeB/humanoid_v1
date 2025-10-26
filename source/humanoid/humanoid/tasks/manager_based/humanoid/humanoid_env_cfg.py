@@ -30,8 +30,9 @@ from . import mdp
 #Tested following fps: 15, 24, 36, 48
 animation_fps = 24.0
 num_frames = 30
-damping_val = 0.5
-stiffness_val = 25.0
+stiffness_val = 20.0
+damping_val = 5.0
+armature = 0.01
 joints = [
     'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
     'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right', 'right_ankle',
@@ -47,10 +48,10 @@ HUMANOID_CONFIG = ArticulationCfg(
                                activate_contact_sensors=True),
     init_state=ArticulationCfg.InitialStateCfg(pos=(0.0, 0.0, 0.62)),
     actuators={"actuators": ImplicitActuatorCfg(joint_names_expr=joints, 
-                                                effort_limit = 80.0,
-                                                velocity_limit = 15.0,
+                                                effort_limit_sim = 80.0,
                                                 damping=damping_val, 
                                                 stiffness=stiffness_val, 
+                                                armature = armature
                                                 )},
 )
 
@@ -99,7 +100,7 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=joints, scale=1.)
+    joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=joints, scale=30.)
 
     #joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 0.25, use_default_offset = True)
 
