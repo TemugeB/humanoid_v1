@@ -16,6 +16,10 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
+from isaaclab.actuators import ImplicitActuatorCfg, DCMotorCfg
+from isaaclab.terrains import TerrainImporterCfg
+from isaaclab.sensors import ContactSensorCfg
+
 
 from . import mdp
 
@@ -23,8 +27,32 @@ from . import mdp
 # Pre-defined configs
 ##
 
-from isaaclab_assets.robots.cartpole import CARTPOLE_CFG  # isort:skip
+#Tested following fps: 15, 24, 36, 48
+animation_fps = 24.0
+num_frames = 30
+damping_val = 0.5
+stiffness_val = 25.0
+joints = [
+    'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
+    'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right', 'right_ankle',
+    'spine',
+    'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z', 'left_elbow',
+    'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'    
+]
 
+#usd_path = "/home/temuge/robots/spiderbot/robot_w_tip/spiderbot.usd"
+usd_path = "/home/temuge/my_bots/humanoid/robot/humanoid.usd"
+HUMANOID_CONFIG = ArticulationCfg(
+    spawn=sim_utils.UsdFileCfg(usd_path=usd_path,
+                               activate_contact_sensors=True),
+    init_state=ArticulationCfg.InitialStateCfg(pos=(0.0, 0.0, 0.62)),
+    actuators={"actuators": ImplicitActuatorCfg(joint_names_expr=joints, 
+                                                effort_limit = 80.0,
+                                                velocity_limit = 15.0,
+                                                damping=damping_val, 
+                                                stiffness=stiffness_val, 
+                                                )},
+)
 
 ##
 # Scene definition
@@ -36,19 +64,30 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
     """Configuration for a cart-pole scene."""
 
     # ground plane
-    ground = AssetBaseCfg(
+    terrain = TerrainImporterCfg(
         prim_path="/World/ground",
-        spawn=sim_utils.GroundPlaneCfg(size=(100.0, 100.0)),
+        terrain_type="plane",
+        collision_group=-1,
+        physics_material=sim_utils.RigidBodyMaterialCfg(
+            friction_combine_mode="average",
+            restitution_combine_mode="average",
+            static_friction=1.0,
+            dynamic_friction=1.0,
+            restitution=0.5,
+        ),
+        visual_material = sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0)),
+        debug_vis=False,
     )
 
     # robot
-    robot: ArticulationCfg = CARTPOLE_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    robot: ArticulationCfg = HUMANOID_CONFIG.replace(prim_path="{ENV_REGEX_NS}/Robot")
 
     # lights
     dome_light = AssetBaseCfg(
         prim_path="/World/DomeLight",
         spawn=sim_utils.DomeLightCfg(color=(0.9, 0.9, 0.9), intensity=500.0),
     )
+    contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/humanoid/.*", history_length=3, track_air_time=True)
 
 
 ##
@@ -60,7 +99,9 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=["slider_to_cart"], scale=100.0)
+    joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=joints, scale=1.)
+
+    #joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 0.25, use_default_offset = True)
 
 
 @configclass
@@ -72,8 +113,19 @@ class ObservationsCfg:
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel)
+        #base_height = ObsTerm(func=mdp.base_pos_z)
+        base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
+        base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
+        base_yaw_roll = ObsTerm(func=mdp.base_yaw_roll)
+        base_angle_to_target = ObsTerm(func=mdp.base_angle_to_target, params={"target_pos": (1000.0, 0.0, 0.0)})
+        base_up_proj = ObsTerm(func=mdp.base_up_proj)
+        base_heading_proj = ObsTerm(func=mdp.base_heading_proj, params={"target_pos": (1000.0, 0.0, 0.0)})
+        joint_pos_norm = ObsTerm(func=mdp.joint_pos_rel)
+        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel, scale=0.2)
+        actions = ObsTerm(func=mdp.last_action)
+        #motion_phase = ObsTerm(func=mdp.motion_phase_observation, params={'animation_fps': animation_fps, 'num_frames': num_frames})
+
+
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -87,24 +139,18 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    # reset
-    reset_cart_position = EventTerm(
-        func=mdp.reset_joints_by_offset,
+    reset_base = EventTerm(
+        func=mdp.reset_root_state_uniform,
         mode="reset",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"]),
-            "position_range": (-1.0, 1.0),
-            "velocity_range": (-0.5, 0.5),
-        },
+        params={"pose_range": {}, "velocity_range": {}},
     )
 
-    reset_pole_position = EventTerm(
+    reset_robot_joints = EventTerm(
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
-            "asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"]),
-            "position_range": (-0.25 * math.pi, 0.25 * math.pi),
-            "velocity_range": (-0.25 * math.pi, 0.25 * math.pi),
+            "position_range": (-0.2, 0.2),
+            "velocity_range": (-0.2, 0.2),
         },
     )
 
@@ -113,41 +159,26 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    # (1) Constant running reward
-    alive = RewTerm(func=mdp.is_alive, weight=1.0)
-    # (2) Failure penalty
-    terminating = RewTerm(func=mdp.is_terminated, weight=-2.0)
-    # (3) Primary task: keep pole upright
-    pole_pos = RewTerm(
-        func=mdp.joint_pos_target_l2,
-        weight=-1.0,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"]), "target": 0.0},
-    )
-    # (4) Shaping tasks: lower cart velocity
-    cart_vel = RewTerm(
-        func=mdp.joint_vel_l1,
-        weight=-0.01,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"])},
-    )
-    # (5) Shaping tasks: lower pole angular velocity
-    pole_vel = RewTerm(
-        func=mdp.joint_vel_l1,
-        weight=-0.005,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"])},
-    )
+    alive = RewTerm(func=mdp.is_alive, weight=0.5)
+    upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
+
 
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    # (1) Time out
+    # time out
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    # (2) Cart out of bounds
-    cart_out_of_bounds = DoneTerm(
-        func=mdp.joint_pos_out_of_manual_limit,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"]), "bounds": (-3.0, 3.0)},
+    # terminate if body part touches the ground
+    base_contact = DoneTerm(
+        func=mdp.illegal_contact,
+        params={"sensor_cfg": SceneEntityCfg("contact_forces", 
+                                             body_names=['hip', 'connector0_3', 'connector0_4', 'connector0_5', 
+                                                         'connector0_2', 'connector0', 'connector3', 'connector3_2',
+                                                         'connector7', 'connector8', 'connector7_2', 'connector8_2']), "threshold": 1.0},
     )
+
 
 
 ##
@@ -172,9 +203,9 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
         """Post initialization."""
         # general settings
         self.decimation = 2
-        self.episode_length_s = 5
+        self.episode_length_s = 10
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
         # simulation settings
-        self.sim.dt = 1 / 120
+        self.sim.dt = 1 / 60
         self.sim.render_interval = self.decimation
