@@ -330,8 +330,34 @@ class joint_position_tracking(ManagerTermBase):
 
         total_reward = torch.stack(rewards, dim = -1).sum(-1)
         return total_reward
-    
-def joint_pos_target_l2(env: ManagerBasedRLEnv, target: float, asset_cfg: SceneEntityCfg) -> torch.Tensor:
+
+class default_pose_tracking(ManagerTermBase):
+
+    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
+
+        self.target_joints = [
+            'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
+            'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right', 'right_ankle',
+            'spine',
+            'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z',
+            'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
+        ]
+
+    def __call__(self, 
+                 env: ManagerBasedRLEnv, 
+                 target: float,
+                 asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+        
+        asset : Articulation = env.scene[asset_cfg.name]
+        
+        if not hasattr(self, 'joint_inds'):
+            joint_inds = [asset.find_joints([joint_name])[0] for joint_name in self.target_joints]
+            self.joint_inds = torch.tesnor(joint_inds)
+
+        joint_pos = wrap_to_pi(asset.data.joint_pos[:, self.joint_inds])
+        return torch.sum(torch.square(joint_pos - target), dim=1)
+
+def joint_pos_target_l2(env: ManagerBasedRLEnv, target: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize joint position deviation from a target value."""
     # extract the used quantities (to enable type-hinting)
     asset: Articulation = env.scene[asset_cfg.name]

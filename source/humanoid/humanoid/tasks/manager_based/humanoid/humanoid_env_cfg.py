@@ -100,9 +100,9 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=joints, scale=30.)
+    #joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=joints, scale=30.)
 
-    #joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 0.25, use_default_offset = True)
+    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 1.0, use_default_offset = True)
 
 
 @configclass
@@ -150,8 +150,8 @@ class EventCfg:
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
-            "position_range": (-0.2, 0.2),
-            "velocity_range": (-0.2, 0.2),
+            "position_range": (-0.3, 0.3),
+            "velocity_range": (-0.3, 0.3),
         },
     )
 
@@ -162,8 +162,8 @@ class RewardsCfg:
 
     alive = RewTerm(func=mdp.is_alive, weight=0.5)
     upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
-
-
+    normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.01, params={'target': 0.0})
+    #torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-0.01)
 
 @configclass
 class TerminationsCfg:
