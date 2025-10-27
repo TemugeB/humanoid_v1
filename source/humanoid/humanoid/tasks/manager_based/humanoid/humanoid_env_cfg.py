@@ -30,8 +30,8 @@ from . import mdp
 #Tested following fps: 15, 24, 36, 48
 animation_fps = 24.0
 num_frames = 30
-stiffness_val = 20.0
-damping_val = 5.0
+# stiffness_val = 20.0
+# damping_val = 5.0
 armature = 0.01
 joints = [
     'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
@@ -41,6 +41,36 @@ joints = [
     'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'    
 ]
 
+stiffness_damping = {
+    #left leg
+    'hip_left_y': [80.0, 28.0], 
+    'hip_left_x': [80.0, 28.0], 
+    'hip_left_z': [80.0, 28.0], 
+    'knee_left' : [80.0, 15.0], 
+    'left_ankle': [40.0, 17.0],
+
+    #right_leg
+    'hip_right_y': [80.0, 28.0], 
+    'hip_right_x': [80.0, 28.0], 
+    'hip_right_z': [80.0, 28.0], 
+    'knee_right' : [80.0, 15.0], 
+    'right_ankle': [40.0, 17.0],
+
+    'spine': [80.0, 43.0],
+
+    #left arm
+    'left_shoulder_y': [80.0, 15.0], 
+    'left_shoulder_x': [80.0, 15.0], 
+    'left_shoulder_z': [80.0, 15.0], 
+    'left_elbow':      [40.0,  3.0],
+
+    #right arm
+    'right_shoulder_y': [80.0, 15.0], 
+    'right_shoulder_x': [80.0, 15.0], 
+    'right_shoulder_z': [80.0, 15.0], 
+    'right_elbow':      [40.0,  3.0]    
+}
+
 #usd_path = "/home/temuge/robots/spiderbot/robot_w_tip/spiderbot.usd"
 usd_path = "/home/temuge/my_bots/humanoid/robot/humanoid.usd"
 HUMANOID_CONFIG = ArticulationCfg(
@@ -49,8 +79,8 @@ HUMANOID_CONFIG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(pos=(0.0, 0.0, 0.62)),
     actuators={"actuators": ImplicitActuatorCfg(joint_names_expr=joints, 
                                                 effort_limit_sim = 80.0,
-                                                damping=damping_val, 
-                                                stiffness=stiffness_val, 
+                                                stiffness={k: v[0] for k, v in stiffness_damping.items()}, 
+                                                damping=  {k: v[1] for k, v in stiffness_damping.items()}, 
                                                 armature = armature
                                                 )},
 )
