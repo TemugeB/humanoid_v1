@@ -124,14 +124,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                 "knee_right":  50.0
             },
             damping={
-                "hip_left_y":  15.0,
-                "hip_left_x":  15.0,
-                "hip_left_z":  15.0,
-                "hip_right_y": 15.0,
-                "hip_right_x": 15.0,
-                "hip_right_z": 15.0,
-                "knee_left":   15.0,
-                "knee_right":  15.0
+                "hip_left_y":  25.0,
+                "hip_left_x":  25.0,
+                "hip_left_z":  25.0,
+                "hip_right_y": 25.0,
+                "hip_right_x": 25.0,
+                "hip_right_z": 25.0,
+                "knee_left":   25.0,
+                "knee_right":  25.0
             },
             armature = 0.01
 
@@ -149,7 +149,7 @@ HUMANOID_CONFIG = ArticulationCfg(
             joint_names_expr=["spine"],
             effort_limit_sim=150,
             stiffness={"spine": 80.0},
-            damping={"spine": 5.0},
+            damping={"spine": 45.0},
             armature = 0.01
 
         ),
@@ -331,7 +331,7 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self) -> None:
         """Post initialization."""
         # general settings
-        self.decimation = 4
+        self.decimation = 8
         self.episode_length_s = 10
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
