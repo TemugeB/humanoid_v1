@@ -43,46 +43,144 @@ joints = [
 
 stiffness_damping = {
     #left leg
-    'hip_left_y': [80.0, 28.0], 
-    'hip_left_x': [80.0, 28.0], 
-    'hip_left_z': [80.0, 28.0], 
-    'knee_left' : [80.0, 15.0], 
-    'left_ankle': [40.0, 17.0],
+    'hip_left_y': [40.0, 1.0], 
+    'hip_left_x': [40.0, 1.0], 
+    'hip_left_z': [40.0, 1.0], 
+    'knee_left' : [40.0, 1.0], 
+    'left_ankle': [20.0, 5.0],
 
     #right_leg
-    'hip_right_y': [80.0, 28.0], 
-    'hip_right_x': [80.0, 28.0], 
-    'hip_right_z': [80.0, 28.0], 
-    'knee_right' : [80.0, 15.0], 
-    'right_ankle': [40.0, 17.0],
+    'hip_right_y': [40.0, 1.0], 
+    'hip_right_x': [40.0, 1.0], 
+    'hip_right_z': [40.0, 1.0], 
+    'knee_right' : [40.0, 1.0], 
+    'right_ankle': [20.0, 5.0],
 
     'spine': [80.0, 43.0],
 
     #left arm
-    'left_shoulder_y': [80.0, 15.0], 
-    'left_shoulder_x': [80.0, 15.0], 
-    'left_shoulder_z': [80.0, 15.0], 
-    'left_elbow':      [40.0,  3.0],
+    'left_shoulder_y': [40.0, 5.0], 
+    'left_shoulder_x': [40.0, 5.0], 
+    'left_shoulder_z': [40.0, 5.0], 
+    'left_elbow':      [20.0,  2.0],
 
     #right arm
-    'right_shoulder_y': [80.0, 15.0], 
-    'right_shoulder_x': [80.0, 15.0], 
-    'right_shoulder_z': [80.0, 15.0], 
-    'right_elbow':      [40.0,  3.0]    
+    'right_shoulder_y': [40.0, 5.0], 
+    'right_shoulder_x': [40.0, 5.0], 
+    'right_shoulder_z': [40.0, 5.0], 
+    'right_elbow':      [20.0,  2.0]    
 }
 
 #usd_path = "/home/temuge/robots/spiderbot/robot_w_tip/spiderbot.usd"
 usd_path = "/home/temuge/my_bots/humanoid/robot/humanoid.usd"
+# HUMANOID_CONFIG = ArticulationCfg(
+#     spawn=sim_utils.UsdFileCfg(usd_path=usd_path,
+#                                activate_contact_sensors=True),
+#     init_state=ArticulationCfg.InitialStateCfg(pos=(0.0, 0.0, 0.62)),
+#     actuators={"actuators": ImplicitActuatorCfg(joint_names_expr=joints, 
+#                                                 effort_limit_sim = 100.0,
+#                                                 stiffness={k: v[0] for k, v in stiffness_damping.items()}, 
+#                                                 damping=  {k: v[1] for k, v in stiffness_damping.items()}, 
+#                                                 armature = armature
+#                                                 )},
+# )
+
+
 HUMANOID_CONFIG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(usd_path=usd_path,
-                               activate_contact_sensors=True),
-    init_state=ArticulationCfg.InitialStateCfg(pos=(0.0, 0.0, 0.62)),
-    actuators={"actuators": ImplicitActuatorCfg(joint_names_expr=joints, 
-                                                effort_limit_sim = 80.0,
-                                                stiffness={k: v[0] for k, v in stiffness_damping.items()}, 
-                                                damping=  {k: v[1] for k, v in stiffness_damping.items()}, 
-                                                armature = armature
-                                                )},
+    spawn=sim_utils.UsdFileCfg(
+        usd_path=usd_path,
+        activate_contact_sensors=True,
+        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+            disable_gravity=False,
+            retain_accelerations=False,
+            linear_damping=0.0,
+            angular_damping=0.0,
+            max_linear_velocity=1000.0,
+            max_angular_velocity=1000.0,
+            max_depenetration_velocity=1.0,
+        ),
+        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=4
+        ),
+    ),
+    init_state=ArticulationCfg.InitialStateCfg(
+        pos=(0.0, 0.0, 0.62),
+    ),
+    #soft_joint_pos_limit_factor=0.9,
+    actuators={
+        "legs": ImplicitActuatorCfg(
+            joint_names_expr=[    
+                'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left',
+                'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right'],
+            effort_limit_sim=150,
+            stiffness={
+                "hip_left_y":  50.0,
+                "hip_left_x":  50.0,
+                "hip_left_z":  50.0,
+                "hip_right_y": 50.0,
+                "hip_right_x": 50.0,
+                "hip_right_z": 50.0,
+                "knee_left":   50.0,
+                "knee_right":  50.0
+            },
+            damping={
+                "hip_left_y":  10.0,
+                "hip_left_x":  10.0,
+                "hip_left_z":  10.0,
+                "hip_right_y": 10.0,
+                "hip_right_x": 10.0,
+                "hip_right_z": 10.0,
+                "knee_left":   10.0,
+                "knee_right":  10.0
+            },
+            armature = 0.01
+
+        ),
+        "feet": ImplicitActuatorCfg(
+            joint_names_expr=["left_ankle", "right_ankle"],
+            effort_limit_sim=40,
+            stiffness={"left_ankle":  10.0,
+                       "right_ankle": 10.0},
+            damping={"left_ankle":    5.0,
+                     "right_ankle":   5.0},
+            armature = 0.01
+        ),
+        "spine": ImplicitActuatorCfg(
+            joint_names_expr=["spine"],
+            effort_limit_sim=150,
+            stiffness={"spine": 80.0},
+            damping={"spine": 5.0},
+            armature = 0.01
+
+        ),
+        "arms": ImplicitActuatorCfg(
+            joint_names_expr=['left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z', 'left_elbow',
+                              'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'],
+            effort_limit_sim=150,
+            stiffness={
+                "left_shoulder_y":  40.0,
+                "left_shoulder_x":  40.0,
+                "left_shoulder_z":  40.0,
+                "left_elbow":       40.0,
+                "right_shoulder_y": 40.0,
+                "right_shoulder_x": 40.0,
+                "right_shoulder_z": 40.0,
+                "right_elbow":      40.0,
+            },
+            damping={
+                "left_shoulder_y":  10.0,
+                "left_shoulder_x":  10.0,
+                "left_shoulder_z":  10.0,
+                "left_elbow":       10.0,
+                "right_shoulder_y": 10.0,
+                "right_shoulder_x": 10.0,
+                "right_shoulder_z": 10.0,
+                "right_elbow":      10.0,
+            },
+            armature = 0.01
+
+        ),
+    },
 )
 
 ##
@@ -129,9 +227,6 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
-
-    #joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=joints, scale=30.)
-
     joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 1.0, use_default_offset = True)
 
 
@@ -148,15 +243,13 @@ class ObservationsCfg:
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
         base_yaw_roll = ObsTerm(func=mdp.base_yaw_roll)
-        base_angle_to_target = ObsTerm(func=mdp.base_angle_to_target, params={"target_pos": (1000.0, 0.0, 0.0)})
+        #base_angle_to_target = ObsTerm(func=mdp.base_angle_to_target, params={"target_pos": (1000.0, 0.0, 0.0)})
         base_up_proj = ObsTerm(func=mdp.base_up_proj)
-        base_heading_proj = ObsTerm(func=mdp.base_heading_proj, params={"target_pos": (1000.0, 0.0, 0.0)})
+        #base_heading_proj = ObsTerm(func=mdp.base_heading_proj, params={"target_pos": (1000.0, 0.0, 0.0)})
         joint_pos_norm = ObsTerm(func=mdp.joint_pos_rel)
         joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel, scale=0.2)
         actions = ObsTerm(func=mdp.last_action)
         #motion_phase = ObsTerm(func=mdp.motion_phase_observation, params={'animation_fps': animation_fps, 'num_frames': num_frames})
-
-
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -191,9 +284,14 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     alive = RewTerm(func=mdp.is_alive, weight=0.5)
-    upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
+    upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.05, params={"threshold": 0.93})
     normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.01, params={'target': 0.0})
     #torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-0.01)
+    #lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-2.0)
+    #ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
+    #dof_torques_l2 = RewTerm(func=mdp.joint_torques_l2, weight=-1.0e-5)
+    #dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
+    #action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
 
 @configclass
 class TerminationsCfg:
@@ -238,5 +336,5 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
         # simulation settings
-        self.sim.dt = 1 / 60
+        self.sim.dt = 0.004
         self.sim.render_interval = self.decimation
