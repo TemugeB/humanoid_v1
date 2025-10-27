@@ -124,14 +124,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                 "knee_right":  50.0
             },
             damping={
-                "hip_left_y":  10.0,
-                "hip_left_x":  10.0,
-                "hip_left_z":  10.0,
-                "hip_right_y": 10.0,
-                "hip_right_x": 10.0,
-                "hip_right_z": 10.0,
-                "knee_left":   10.0,
-                "knee_right":  10.0
+                "hip_left_y":  15.0,
+                "hip_left_x":  15.0,
+                "hip_left_z":  15.0,
+                "hip_right_y": 15.0,
+                "hip_right_x": 15.0,
+                "hip_right_z": 15.0,
+                "knee_left":   15.0,
+                "knee_right":  15.0
             },
             armature = 0.01
 
@@ -168,14 +168,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                 "right_elbow":      40.0,
             },
             damping={
-                "left_shoulder_y":  10.0,
-                "left_shoulder_x":  10.0,
-                "left_shoulder_z":  10.0,
-                "left_elbow":       10.0,
-                "right_shoulder_y": 10.0,
-                "right_shoulder_x": 10.0,
-                "right_shoulder_z": 10.0,
-                "right_elbow":      10.0,
+                "left_shoulder_y":  15.0,
+                "left_shoulder_x":  15.0,
+                "left_shoulder_z":  15.0,
+                "left_elbow":       15.0,
+                "right_shoulder_y": 15.0,
+                "right_shoulder_x": 15.0,
+                "right_shoulder_z": 15.0,
+                "right_elbow":      15.0,
             },
             armature = 0.01
 
@@ -283,7 +283,7 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    alive = RewTerm(func=mdp.is_alive, weight=0.5)
+    alive = RewTerm(func=mdp.is_alive, weight=0.75)
     upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.05, params={"threshold": 0.93})
     normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.01, params={'target': 0.0})
     #torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-0.01)
@@ -331,7 +331,7 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self) -> None:
         """Post initialization."""
         # general settings
-        self.decimation = 2
+        self.decimation = 4
         self.episode_length_s = 10
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
