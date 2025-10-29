@@ -72,7 +72,7 @@ stiffness_damping = {
 }
 
 #usd_path = "/home/temuge/robots/spiderbot/robot_w_tip/spiderbot.usd"
-usd_path = "/home/temuge/my_bots/humanoid/robot/humanoid.usd"
+usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
 # HUMANOID_CONFIG = ArticulationCfg(
 #     spawn=sim_utils.UsdFileCfg(usd_path=usd_path,
 #                                activate_contact_sensors=True),
@@ -303,7 +303,7 @@ class RewardsCfg:
 
     alive = RewTerm(func=mdp.is_alive, weight=15.0)
     upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
-    normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.005, params={'target': 0.0})
+    normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.05, params={'target': 0.0})
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-5)
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-7)
     action_l2 = RewTerm(func=mdp.action_l2, weight = -0.05)
