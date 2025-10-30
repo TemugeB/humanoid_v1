@@ -41,50 +41,9 @@ joints = [
     'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'    
 ]
 
-stiffness_damping = {
-    #left leg
-    'hip_left_y': [40.0, 1.0], 
-    'hip_left_x': [40.0, 1.0], 
-    'hip_left_z': [40.0, 1.0], 
-    'knee_left' : [40.0, 1.0], 
-    'left_ankle': [20.0, 5.0],
-
-    #right_leg
-    'hip_right_y': [40.0, 1.0], 
-    'hip_right_x': [40.0, 1.0], 
-    'hip_right_z': [40.0, 1.0], 
-    'knee_right' : [40.0, 1.0], 
-    'right_ankle': [20.0, 5.0],
-
-    'spine': [80.0, 43.0],
-
-    #left arm
-    'left_shoulder_y': [40.0, 5.0], 
-    'left_shoulder_x': [40.0, 5.0], 
-    'left_shoulder_z': [40.0, 5.0], 
-    'left_elbow':      [20.0,  2.0],
-
-    #right arm
-    'right_shoulder_y': [40.0, 5.0], 
-    'right_shoulder_x': [40.0, 5.0], 
-    'right_shoulder_z': [40.0, 5.0], 
-    'right_elbow':      [20.0,  2.0]    
-}
 
 #usd_path = "/home/temuge/robots/spiderbot/robot_w_tip/spiderbot.usd"
 usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
-# HUMANOID_CONFIG = ArticulationCfg(
-#     spawn=sim_utils.UsdFileCfg(usd_path=usd_path,
-#                                activate_contact_sensors=True),
-#     init_state=ArticulationCfg.InitialStateCfg(pos=(0.0, 0.0, 0.62)),
-#     actuators={"actuators": ImplicitActuatorCfg(joint_names_expr=joints, 
-#                                                 effort_limit_sim = 100.0,
-#                                                 stiffness={k: v[0] for k, v in stiffness_damping.items()}, 
-#                                                 damping=  {k: v[1] for k, v in stiffness_damping.items()}, 
-#                                                 armature = armature
-#                                                 )},
-# )
-
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -100,7 +59,7 @@ HUMANOID_CONFIG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=4
+            enabled_self_collisions=True, solver_position_iteration_count=4, solver_velocity_iteration_count=4
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -156,7 +115,7 @@ HUMANOID_CONFIG = ArticulationCfg(
         "arms": ImplicitActuatorCfg(
             joint_names_expr=['left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z', 'left_elbow',
                               'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'],
-            effort_limit_sim=0.,
+            effort_limit_sim=40.,
             stiffness={
                 "left_shoulder_y":  40.0,
                 "left_shoulder_x":  40.0,
@@ -227,7 +186,7 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
-    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 1.0, use_default_offset = True)
+    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 0.5, use_default_offset = True)
 
 
 @configclass
@@ -302,15 +261,16 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     alive = RewTerm(func=mdp.is_alive, weight=15.0)
-    upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
-    normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.05, params={'target': 0.0})
+    #upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
+    normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.5, params={'target': 0.0})
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-5)
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-7)
     action_l2 = RewTerm(func=mdp.action_l2, weight = -0.05)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.1)
+    root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -0.1)
+    root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
     #lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-2.0)
     #ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
-    #dof_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-7)
 
 @configclass
 class TerminationsCfg:

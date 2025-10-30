@@ -365,3 +365,12 @@ def joint_pos_target_l2(env: ManagerBasedRLEnv, target: float, asset_cfg: SceneE
     joint_pos = wrap_to_pi(asset.data.joint_pos[:, asset_cfg.joint_ids])
     # compute the reward
     return torch.sum(torch.square(joint_pos - target), dim=1)
+
+def root_motion_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+
+    root_velocities = mdp.base_lin_vel(env, asset_cfg)
+    return torch.sum(torch.square(root_velocities), dim=1)
+
+def root_rotation_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    root_angular_velocities = mdp.base_ang_vel(env, asset_cfg)
+    return torch.sum(torch.square(root_angular_velocities), dim=1)
