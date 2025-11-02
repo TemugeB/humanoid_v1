@@ -73,14 +73,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                 'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right'],
             effort_limit_sim=150,
             stiffness={
-                "hip_left_y":  50.0,
-                "hip_left_x":  50.0,
-                "hip_left_z":  50.0,
-                "hip_right_y": 50.0,
-                "hip_right_x": 50.0,
-                "hip_right_z": 50.0,
-                "knee_left":   50.0,
-                "knee_right":  50.0
+                "hip_left_y":  45.0,
+                "hip_left_x":  45.0,
+                "hip_left_z":  45.0,
+                "hip_right_y": 45.0,
+                "hip_right_x": 45.0,
+                "hip_right_z": 45.0,
+                "knee_left":   45.0,
+                "knee_right":  45.0
             },
             damping={
                 "hip_left_y":  15.0,
@@ -98,8 +98,8 @@ HUMANOID_CONFIG = ArticulationCfg(
         "feet": ImplicitActuatorCfg(
             joint_names_expr=["left_ankle", "right_ankle"],
             effort_limit_sim=40,
-            stiffness={"left_ankle":  10.0,
-                       "right_ankle": 10.0},
+            stiffness={"left_ankle":  15.0,
+                       "right_ankle": 15.0},
             damping={"left_ankle":    5.0,
                      "right_ankle":   5.0},
             armature = 0.01
@@ -107,8 +107,8 @@ HUMANOID_CONFIG = ArticulationCfg(
         "spine": ImplicitActuatorCfg(
             joint_names_expr=["spine"],
             effort_limit_sim=80.,
-            stiffness={"spine": 80.0},
-            damping={"spine": 45.0},
+            stiffness={"spine": 60.0},
+            damping={"spine": 25.0},
             armature = 0.01
 
         ),
@@ -117,14 +117,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                               'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'],
             effort_limit_sim=40.,
             stiffness={
-                "left_shoulder_y":  40.0,
-                "left_shoulder_x":  40.0,
-                "left_shoulder_z":  40.0,
-                "left_elbow":       40.0,
-                "right_shoulder_y": 40.0,
-                "right_shoulder_x": 40.0,
-                "right_shoulder_z": 40.0,
-                "right_elbow":      40.0,
+                "left_shoulder_y":  30.0,
+                "left_shoulder_x":  30.0,
+                "left_shoulder_z":  30.0,
+                "left_elbow":       30.0,
+                "right_shoulder_y": 30.0,
+                "right_shoulder_x": 30.0,
+                "right_shoulder_z": 30.0,
+                "right_elbow":      30.0,
             },
             damping={
                 "left_shoulder_y":  15.0,
@@ -186,7 +186,7 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
-    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 0.5, use_default_offset = True)
+    joint_pos = mdp.JointPositionActionCfg(asset_name="robot", joint_names=joints, scale = 1.0, use_default_offset = True)
 
 
 @configclass
@@ -201,12 +201,13 @@ class ObservationsCfg:
         #base_height = ObsTerm(func=mdp.base_pos_z)
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
-        base_yaw_roll = ObsTerm(func=mdp.base_yaw_roll)
+        base_yaw_roll = ObsTerm(func=mdp.base_yaw_pitch_roll)
         #base_angle_to_target = ObsTerm(func=mdp.base_angle_to_target, params={"target_pos": (1000.0, 0.0, 0.0)})
         base_up_proj = ObsTerm(func=mdp.base_up_proj)
         #base_heading_proj = ObsTerm(func=mdp.base_heading_proj, params={"target_pos": (1000.0, 0.0, 0.0)})
         joint_pos_norm = ObsTerm(func=mdp.joint_pos_rel)
         joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel, scale=0.2)
+        #joint_acc_rel = ObsTerm(func=mdp.joint_acceleration, scale = 0.1)
         actions = ObsTerm(func=mdp.last_action)
         #motion_phase = ObsTerm(func=mdp.motion_phase_observation, params={'animation_fps': animation_fps, 'num_frames': num_frames})
 
@@ -222,18 +223,12 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    reset_base = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={"pose_range": {}, "velocity_range": {}},
-    )
-
     reset_robot_joints = EventTerm(
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
-            "position_range": (-0.3, 0.3),
-            "velocity_range": (-0.3, 0.3),
+            "position_range": (-0.4, 0.4),
+            "velocity_range": (-0.4, 0.4),
         },
     )
 
@@ -241,8 +236,8 @@ class EventCfg:
         func=mdp.apply_external_force_torque,
         mode='reset',
         params={
-            'force_range': (-.1, .1),
-            'torque_range': (-.1, .1)
+            'force_range': (-.3, .3),
+            'torque_range': (-.3, .3)
         }
     )
 
@@ -250,9 +245,25 @@ class EventCfg:
         func=mdp.push_by_setting_velocity,
         mode='reset',
         params={
-            'velocity_range': {'x': (-0.5, 0.5),
-                               'y': (-0.5, 0.5)}
+            'velocity_range': {'x': (-0.65, 0.65),
+                               'y': (-0.65, 0.65)}
         }
+    )
+
+    reset_base = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {"yaw": (-3.14, 3.14)},
+            "velocity_range": {
+                "x": (-0.65, 0.65),
+                "y": (-0.65, 0.65),
+                "z": (-0.65, 0.65),
+                "roll": (-0.5, 0.5),
+                "pitch": (-0.5, 0.5),
+                "yaw": (-0.5, 0.5),
+            },
+        },
     )
 
 
@@ -260,16 +271,15 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    alive = RewTerm(func=mdp.is_alive, weight=15.0)
+    alive = RewTerm(func=mdp.is_alive, weight=20.0)
     #upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
     normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.5, params={'target': 0.0})
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-5)
-    joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-7)
-    action_l2 = RewTerm(func=mdp.action_l2, weight = -0.05)
-    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.1)
-    root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -0.1)
+    joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-4)
+    action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
+    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.0)
+    root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -10.0)
     root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
-    #lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-2.0)
     #ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
 
 @configclass
@@ -311,9 +321,9 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
         """Post initialization."""
         # general settings
         self.decimation = 1
-        self.episode_length_s = 6
+        self.episode_length_s = 8
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
         # simulation settings
-        self.sim.dt = 1/50.
+        self.sim.dt = 1/100.
         self.sim.render_interval = self.decimation

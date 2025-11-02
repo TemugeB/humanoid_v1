@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 import isaaclab.utils.math as math_utils
 from isaaclab.assets import Articulation
 from isaaclab.managers import SceneEntityCfg
+from isaaclab.managers import ManagerTermBase, RewardTermCfg, SceneEntityCfg, ObservationTermCfg
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedEnv
@@ -30,6 +31,22 @@ def base_yaw_roll(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityC
 
     return torch.cat((yaw.unsqueeze(-1), roll.unsqueeze(-1)), dim=-1)
 
+
+def base_yaw_pitch_roll(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """Yaw, pitch, and roll of the base in the simulation world frame."""
+    asset: Articulation = env.scene[asset_cfg.name]
+
+    # Extract Euler angles (XYZ convention)
+    roll, pitch, yaw = math_utils.euler_xyz_from_quat(asset.data.root_quat_w)
+
+    # Normalize to [-pi, pi]
+    roll = torch.atan2(torch.sin(roll), torch.cos(roll))
+    pitch = torch.atan2(torch.sin(pitch), torch.cos(pitch))
+    yaw = torch.atan2(torch.sin(yaw), torch.cos(yaw))
+
+    return torch.cat((yaw.unsqueeze(-1),
+                      pitch.unsqueeze(-1),
+                      roll.unsqueeze(-1)), dim=-1)
 
 def base_up_proj(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Projection of the base up vector onto the world up vector."""
@@ -88,3 +105,28 @@ def motion_phase_observation(env: ManagerBasedEnv,
     # warp to trajectory length
     phase = (frame_idx % num_frames) / num_frames
     return phase.unsqueeze(-1)
+
+class joint_acceleration(ManagerTermBase):
+
+    def __call__(self, 
+                 env, 
+                 asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+
+        asset: Articulation = env.scene[asset_cfg.name]
+
+        if not hasattr(self, 'prev_vel'):
+            self.prev_vel = mdp.joint_vel_rel(env, asset_cfg)
+        
+        #calculate the change in velocity
+        current_joint_vel = mdp.joint_vel_rel(env, asset_cfg)
+        accelerations = current_joint_vel - self.prev_vel
+        
+        #save the current vel for next call
+        self.prev_vel = current_joint_vel
+
+        return accelerations
+
+def joint_acc(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
+
+    asset: Articulation = env.scene[asset_cfg.name]
+    return asset.data.joint_acc
