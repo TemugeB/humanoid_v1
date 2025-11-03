@@ -374,3 +374,26 @@ def root_motion_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEnti
 def root_rotation_l2(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     root_angular_velocities = mdp.base_ang_vel(env, asset_cfg)
     return torch.sum(torch.square(root_angular_velocities), dim=1)
+
+
+class action_acc_l2(ManagerTermBase):
+    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
+
+        action_shape = env.action_manager.action.shape # Get shape from the first action
+        device = env.device # Get device from the environment
+
+        self.last_action = torch.zeros(action_shape, device=device)
+        self.last_last_action = torch.zeros(action_shape, device=device)
+
+    def __call__(self, 
+                 env: ManagerBasedRLEnv) -> torch.Tensor:
+
+        current_action = env.action_manager.action
+        action_diff = current_action - 2 * self.last_action + self.last_last_action
+        reward_term = torch.square(torch.sum(action_diff, dim=-1))
+
+        self.last_last_action = self.last_action
+        self.last_action = current_action
+
+        return reward_term
+    

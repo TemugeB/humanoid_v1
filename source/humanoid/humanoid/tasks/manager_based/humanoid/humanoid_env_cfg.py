@@ -42,8 +42,8 @@ joints = [
 ]
 
 
-#usd_path = "/home/temuge/robots/spiderbot/robot_w_tip/spiderbot.usd"
 usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
+usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -276,9 +276,10 @@ class RewardsCfg:
     normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.5, params={'target': 0.0})
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-5)
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-4)
-    action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
-    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.0)
-    root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -10.0)
+    #action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
+    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.5)
+    action_accel_l2 = RewTerm(func=mdp.action_acc_l2, weight=-0.45)
+    root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -5.0)
     root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
     #ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
 
