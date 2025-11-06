@@ -12,6 +12,8 @@ import isaaclab.utils.math as math_utils
 from isaaclab.assets import Articulation
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import ManagerTermBase, RewardTermCfg, SceneEntityCfg, ObservationTermCfg
+from isaaclab.sensors import ContactSensor
+
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedEnv
@@ -134,4 +136,8 @@ def joint_acc(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("
 
 def feet_contact(env, sensor_cfg: SceneEntityCfg):
 
-    return
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    contacts = contact_sensor.data.net_forces_w_history[:, :, sensor_cfg.body_ids, :].norm(dim=-1).max(dim=1)[0]
+    contacts = (contacts>=1.0).float()
+    #contacts = contact_sensor.data.net_forces_w_history[:, :, sensor_cfg.body_ids, :].norm(dim=-1).max(dim=1)[0] > 1.0
+    return contacts
