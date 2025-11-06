@@ -12,6 +12,7 @@ import isaaclab.utils.math as math_utils
 import isaaclab.utils.string as string_utils
 from isaaclab.assets import Articulation
 from isaaclab.managers import ManagerTermBase, RewardTermCfg, SceneEntityCfg
+from isaaclab.sensors import ContactSensor
 
 from isaaclab.envs import mdp
 from isaaclab.utils.math import quat_conjugate, quat_apply, quat_mul, wrap_to_pi
@@ -335,9 +336,17 @@ class default_pose_tracking(ManagerTermBase):
 
     def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
 
+        # self.target_joints = [
+        #     'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
+        #     'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right', 'right_ankle',
+        #     'spine',
+        #     'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z',
+        #     'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
+        # ]
+
         self.target_joints = [
-            'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
-            'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right', 'right_ankle',
+            'hip_left_x', 'hip_left_z',
+            'hip_right_x', 'hip_right_z',
             'spine',
             'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z',
             'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
@@ -397,3 +406,38 @@ class action_acc_l2(ManagerTermBase):
 
         return reward_term
     
+
+def feet_slide(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """Penalize feet sliding.
+
+    This function penalizes the agent for sliding its feet on the ground. The reward is computed as the
+    norm of the linear velocity of the feet multiplied by a binary contact sensor. This ensures that the
+    agent is penalized only when the feet are in contact with the ground.
+    """
+    # Penalize feet sliding
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    contacts = contact_sensor.data.net_forces_w_history[:, :, sensor_cfg.body_ids, :].norm(dim=-1).max(dim=1)[0] > 1.0
+    asset = env.scene[asset_cfg.name]
+
+    body_vel = asset.data.body_lin_vel_w[:, asset_cfg.body_ids, :2]
+    reward = torch.sum(body_vel.norm(dim=-1) * contacts, dim=1)
+    return reward
+
+def feet_motion(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """Penalize feet sliding.
+
+    This function penalizes the agent for sliding its feet on the ground. The reward is computed as the
+    norm of the linear velocity of the feet multiplied by a binary contact sensor. This ensures that the
+    agent is penalized only when the feet are in contact with the ground.
+    """
+    asset = env.scene[asset_cfg.name]
+
+    body_vel = asset.data.body_lin_vel_w[:, asset_cfg.body_ids, :2]
+    reward = torch.sum(body_vel.norm(dim=-1), dim=1)
+    return reward
+
+def is_terminated(env: ManagerBasedRLEnv) -> torch.Tensor:
+    """Penalize terminated episodes that don't correspond to episodic timeouts."""
+    return env.termination_manager.terminated.float()
+
+

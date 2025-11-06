@@ -130,3 +130,8 @@ def joint_acc(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("
 
     asset: Articulation = env.scene[asset_cfg.name]
     return asset.data.joint_acc
+
+
+def feet_contact(env, sensor_cfg: SceneEntityCfg):
+
+    return
