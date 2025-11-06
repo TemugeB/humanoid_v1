@@ -43,7 +43,7 @@ joints = [
 
 
 usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
-usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
+#usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -73,14 +73,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                 'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right'],
             effort_limit_sim=500,
             stiffness={
-                "hip_left_y":  60.0,
-                "hip_left_x":  60.0,
-                "hip_left_z":  60.0,
-                "hip_right_y": 60.0,
-                "hip_right_x": 60.0,
-                "hip_right_z": 60.0,
-                "knee_left":   60.0,
-                "knee_right":  60.0
+                "hip_left_y":  75.0,
+                "hip_left_x":  75.0,
+                "hip_left_z":  75.0,
+                "hip_right_y": 75.0,
+                "hip_right_x": 75.0,
+                "hip_right_z": 75.0,
+                "knee_left":   75.0,
+                "knee_right":  75.0
             },
             damping={
                 "hip_left_y":  45.0,
@@ -98,8 +98,8 @@ HUMANOID_CONFIG = ArticulationCfg(
         "feet": ImplicitActuatorCfg(
             joint_names_expr=["left_ankle", "right_ankle"],
             effort_limit_sim=500,
-            stiffness={"left_ankle":  45.0,
-                       "right_ankle": 45.0},
+            stiffness={"left_ankle":  75.0,
+                       "right_ankle": 75.0},
             damping={"left_ankle":    45.0,
                      "right_ankle":   45.0},
             armature = 0.01
@@ -281,11 +281,11 @@ class RewardsCfg:
     #action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.5)
     action_accel_l2 = RewTerm(func=mdp.action_acc_l2, weight=-0.45)
-    root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -3.0)
-    root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
-    feet_slide = RewTerm(func=mdp.feet_slide, weight = -.05, params={
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
-            "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
+    #root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -3.0)
+    #root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
+    # feet_slide = RewTerm(func=mdp.feet_slide, weight = -.01, params={
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
     #ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
 
 @configclass
