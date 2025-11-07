@@ -43,7 +43,7 @@ joints = [
 
 
 usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
-#usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
+usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -73,16 +73,6 @@ HUMANOID_CONFIG = ArticulationCfg(
                 'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right'],
             effort_limit_sim=500,
             stiffness={
-                "hip_left_y":  75.0,
-                "hip_left_x":  75.0,
-                "hip_left_z":  75.0,
-                "hip_right_y": 75.0,
-                "hip_right_x": 75.0,
-                "hip_right_z": 75.0,
-                "knee_left":   75.0,
-                "knee_right":  75.0
-            },
-            damping={
                 "hip_left_y":  45.0,
                 "hip_left_x":  45.0,
                 "hip_left_z":  45.0,
@@ -92,23 +82,33 @@ HUMANOID_CONFIG = ArticulationCfg(
                 "knee_left":   45.0,
                 "knee_right":  45.0
             },
+            damping={
+                "hip_left_y":  20.0,
+                "hip_left_x":  20.0,
+                "hip_left_z":  20.0,
+                "hip_right_y": 20.0,
+                "hip_right_x": 20.0,
+                "hip_right_z": 20.0,
+                "knee_left":   20.0,
+                "knee_right":  20.0
+            },
             armature = 0.01
 
         ),
         "feet": ImplicitActuatorCfg(
             joint_names_expr=["left_ankle", "right_ankle"],
             effort_limit_sim=500,
-            stiffness={"left_ankle":  75.0,
-                       "right_ankle": 75.0},
-            damping={"left_ankle":    45.0,
-                     "right_ankle":   45.0},
+            stiffness={"left_ankle":  25.0,
+                       "right_ankle": 25.0},
+            damping={"left_ankle":    5.0,
+                     "right_ankle":   5.0},
             armature = 0.01
         ),
         "spine": ImplicitActuatorCfg(
             joint_names_expr=["spine"],
             effort_limit_sim=500.,
             stiffness={"spine": 60.0},
-            damping={"spine": 60.0},
+            damping={"spine": 25.0},
             armature = 0.01
 
         ),
@@ -127,14 +127,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                 "right_elbow":      30.0,
             },
             damping={
-                "left_shoulder_y":  45.0,
-                "left_shoulder_x":  45.0,
-                "left_shoulder_z":  45.0,
-                "left_elbow":       45.0,
-                "right_shoulder_y": 45.0,
-                "right_shoulder_x": 45.0,
-                "right_shoulder_z": 45.0,
-                "right_elbow":      45.0,
+                "left_shoulder_y":  15.0,
+                "left_shoulder_x":  15.0,
+                "left_shoulder_z":  15.0,
+                "left_elbow":       15.0,
+                "right_shoulder_y": 15.0,
+                "right_shoulder_x": 15.0,
+                "right_shoulder_z": 15.0,
+                "right_elbow":      15.0,
             },
             armature = 0.01
 
@@ -201,7 +201,7 @@ class ObservationsCfg:
         #base_height = ObsTerm(func=mdp.base_pos_z)
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
-        base_yaw_roll = ObsTerm(func=mdp.base_yaw_pitch_roll)
+        base_orientation = ObsTerm(func=mdp.base_yaw_pitch_roll)
         #base_angle_to_target = ObsTerm(func=mdp.base_angle_to_target, params={"target_pos": (1000.0, 0.0, 0.0)})
         base_up_proj = ObsTerm(func=mdp.base_up_proj)
         #base_heading_proj = ObsTerm(func=mdp.base_heading_proj, params={"target_pos": (1000.0, 0.0, 0.0)})
@@ -275,7 +275,7 @@ class RewardsCfg:
     alive = RewTerm(func=mdp.is_alive, weight=20.0)
     #termination_penalty = RewTerm(func=mdp.is_terminated,weight=0.0,)
     #upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
-    normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-2.5, params={'target': 0.0})
+    normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.5, params={'target': 0.0})
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-3)
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-5)
     #action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
