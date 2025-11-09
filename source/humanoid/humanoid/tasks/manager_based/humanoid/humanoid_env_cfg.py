@@ -98,8 +98,8 @@ HUMANOID_CONFIG = ArticulationCfg(
         "feet": ImplicitActuatorCfg(
             joint_names_expr=["left_ankle", "right_ankle"],
             effort_limit_sim=500,
-            stiffness={"left_ankle":  65.0,
-                       "right_ankle": 65.0},
+            stiffness={"left_ankle":  100.0,
+                       "right_ankle": 100.0},
             damping={"left_ankle":    10.0,
                      "right_ankle":   10.0},
             armature = 0.001
@@ -107,8 +107,8 @@ HUMANOID_CONFIG = ArticulationCfg(
         "spine": ImplicitActuatorCfg(
             joint_names_expr=["spine"],
             effort_limit_sim=500.,
-            stiffness={"spine": 60.0},
-            damping={"spine": 25.0},
+            stiffness={"spine": 100.0},
+            damping={"spine": 10.0},
             armature = 0.001
 
         ),
@@ -281,7 +281,7 @@ class RewardsCfg:
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-6)
     #action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.5)
-    action_accel_l2 = RewTerm(func=mdp.action_acc_l2, weight=-0.45)
+    #action_accel_l2 = RewTerm(func=mdp.action_acc_l2, weight=-0.45)
     #root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -3.0)
     #root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
     feet_slide = RewTerm(func=mdp.feet_slide, weight = -.01, params={
