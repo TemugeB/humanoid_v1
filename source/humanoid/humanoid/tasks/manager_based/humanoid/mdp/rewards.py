@@ -334,7 +334,7 @@ class joint_position_tracking(ManagerTermBase):
 
 class default_pose_tracking(ManagerTermBase):
 
-    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
+    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
 
         # self.target_joints = [
         #     'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
@@ -352,19 +352,22 @@ class default_pose_tracking(ManagerTermBase):
             'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
         ]
 
+        asset : Articulation = env.scene[asset_cfg.name]
+        #joint_inds = [asset.find_joints([joint_name])[0] for joint_name in self.target_joints]
+        joint_inds = asset.find_joints(self.target_joints)[0]
+        self.joint_inds = torch.tensor(joint_inds).reshape(-1)
+
     def __call__(self, 
                  env: ManagerBasedRLEnv, 
-                 target: float,
+                 threshold: float,
                  asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
         
         asset : Articulation = env.scene[asset_cfg.name]
-        
-        if not hasattr(self, 'joint_inds'):
-            joint_inds = [asset.find_joints([joint_name])[0] for joint_name in self.target_joints]
-            self.joint_inds = torch.tesnor(joint_inds)
+        joint_pos = asset.data.joint_pos[:, self.joint_inds]
+        #which ones are over threshold
+        over_threshold = torch.abs(joint_pos) > threshold
 
-        joint_pos = wrap_to_pi(asset.data.joint_pos[:, self.joint_inds])
-        return torch.sum(torch.square(joint_pos - target), dim=1)
+        return torch.sum(torch.square(joint_pos * over_threshold), dim=1)
 
 def joint_pos_target_l2(env: ManagerBasedRLEnv, target: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize joint position deviation from a target value."""
