@@ -43,7 +43,7 @@ joints = [
 
 
 usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
-#usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
+usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -73,14 +73,14 @@ HUMANOID_CONFIG = ArticulationCfg(
                 'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right'],
             effort_limit_sim=500,
             stiffness={
-                "hip_left_y":  180.0,
-                "hip_left_x":  180.0,
-                "hip_left_z":  180.0,
-                "hip_right_y": 180.0,
-                "hip_right_x": 180.0,
-                "hip_right_z": 180.0,
-                "knee_left":   180.0,
-                "knee_right":  180.0
+                "hip_left_y":  200.0,
+                "hip_left_x":  200.0,
+                "hip_left_z":  200.0,
+                "hip_right_y": 200.0,
+                "hip_right_x": 200.0,
+                "hip_right_z": 200.0,
+                "knee_left":   200.0,
+                "knee_right":  200.0
             },
             damping={
                 "hip_left_y":  10.0,
@@ -98,8 +98,8 @@ HUMANOID_CONFIG = ArticulationCfg(
         "feet": ImplicitActuatorCfg(
             joint_names_expr=["left_ankle", "right_ankle"],
             effort_limit_sim=500,
-            stiffness={"left_ankle":  100.0,
-                       "right_ankle": 100.0},
+            stiffness={"left_ankle":  130.0,
+                       "right_ankle": 130.0},
             damping={"left_ankle":    10.0,
                      "right_ankle":   10.0},
             armature = 0.001
@@ -107,7 +107,7 @@ HUMANOID_CONFIG = ArticulationCfg(
         "spine": ImplicitActuatorCfg(
             joint_names_expr=["spine"],
             effort_limit_sim=500.,
-            stiffness={"spine": 100.0},
+            stiffness={"spine": 130.0},
             damping={"spine": 10.0},
             armature = 0.001
 
@@ -327,38 +327,10 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self) -> None:
         """Post initialization."""
         # general settings
-        self.decimation = 1
+        self.decimation = 4
         self.episode_length_s = 8
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
         # simulation settings
-        self.sim.dt = 1/100.
-        self.sim.render_interval = self.decimation
-##
-# Environment configuration
-##
-
-
-@configclass
-class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
-    # Scene settings
-    scene: HumanoidSceneCfg = HumanoidSceneCfg(num_envs=4096, env_spacing=4.0)
-    # Basic settings
-    observations: ObservationsCfg = ObservationsCfg()
-    actions: ActionsCfg = ActionsCfg()
-    events: EventCfg = EventCfg()
-    # MDP settings
-    rewards: RewardsCfg = RewardsCfg()
-    terminations: TerminationsCfg = TerminationsCfg()
-
-    # Post initialization
-    def __post_init__(self) -> None:
-        """Post initialization."""
-        # general settings
-        self.decimation = 1
-        self.episode_length_s = 8
-        # viewer settings
-        self.viewer.eye = (8.0, 0.0, 5.0)
-        # simulation settings
-        self.sim.dt = 1/100.
+        self.sim.dt = 1/200.
         self.sim.render_interval = self.decimation
