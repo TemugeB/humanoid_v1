@@ -1,8 +1,3 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
-
 import math
 
 import isaaclab.sim as sim_utils
@@ -19,20 +14,9 @@ from isaaclab.utils import configclass
 from isaaclab.actuators import ImplicitActuatorCfg, DCMotorCfg
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.sensors import ContactSensorCfg
-
-
 from . import mdp
 
-##
-# Pre-defined configs
-##
 
-#Tested following fps: 15, 24, 36, 48
-animation_fps = 24.0
-num_frames = 30
-# stiffness_val = 20.0
-# damping_val = 5.0
-armature = 0.01
 joints = [
     'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
     'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right', 'right_ankle',
@@ -40,7 +24,6 @@ joints = [
     'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z', 'left_elbow',
     'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'    
 ]
-
 
 usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
 usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
@@ -65,7 +48,6 @@ HUMANOID_CONFIG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.62),
     ),
-    #soft_joint_pos_limit_factor=0.9,
     actuators={
         "legs": ImplicitActuatorCfg(
             joint_names_expr=[    
@@ -142,10 +124,6 @@ HUMANOID_CONFIG = ArticulationCfg(
     },
 )
 
-##
-# Scene definition
-##
-
 
 @configclass
 class HumanoidSceneCfg(InteractiveSceneCfg):
@@ -176,11 +154,6 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.DomeLightCfg(color=(0.9, 0.9, 0.9), intensity=500.0),
     )
     contact_forces = ContactSensorCfg(prim_path="{ENV_REGEX_NS}/Robot/humanoid/.*", history_length=3, track_air_time=True)
-
-
-##
-# MDP settings
-##
 
 
 @configclass
@@ -303,12 +276,6 @@ class TerminationsCfg:
                                                          'connector0_2', 'connector0', 'connector3', 'connector3_2',
                                                          'connector7', 'connector8', 'connector7_2', 'connector8_2']), "threshold": 1.0},
     )
-
-
-
-##
-# Environment configuration
-##
 
 
 @configclass
