@@ -47,22 +47,30 @@ HUMANOID_CONFIG = ArticulationCfg(
     ),
     init_state=ArticulationCfg.InitialStateCfg(
         pos=(0.0, 0.0, 0.62),
+        # joint_pos={
+        #     "hip_left_y":  0.31,
+        #     "hip_right_y": -0.31,
+        #     "knee_left": -0.34,
+        #     "knee_right": 0.34, 
+        #     "left_ankle": 0.32,
+        #     "right_ankle": -0.32,
+        # },
     ),
     actuators={
         "legs": ImplicitActuatorCfg(
             joint_names_expr=[    
                 'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left',
                 'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right'],
-            effort_limit_sim=500,
+            effort_limit_sim=300,
             stiffness={
-                "hip_left_y":  200.0,
-                "hip_left_x":  200.0,
-                "hip_left_z":  200.0,
-                "hip_right_y": 200.0,
-                "hip_right_x": 200.0,
-                "hip_right_z": 200.0,
-                "knee_left":   200.0,
-                "knee_right":  200.0
+                "hip_left_y":  150.0,
+                "hip_left_x":  150.0,
+                "hip_left_z":  150.0,
+                "hip_right_y": 150.0,
+                "hip_right_x": 150.0,
+                "hip_right_z": 150.0,
+                "knee_left":   150.0,
+                "knee_right":  150.0
             },
             damping={
                 "hip_left_y":  10.0,
@@ -74,51 +82,51 @@ HUMANOID_CONFIG = ArticulationCfg(
                 "knee_left":   10.0,
                 "knee_right":  10.0
             },
-            armature = 0.001
+            armature = 0.065
 
         ),
         "feet": ImplicitActuatorCfg(
             joint_names_expr=["left_ankle", "right_ankle"],
-            effort_limit_sim=500,
-            stiffness={"left_ankle":  130.0,
-                       "right_ankle": 130.0},
+            effort_limit_sim=300,
+            stiffness={"left_ankle":  100.0,
+                       "right_ankle": 100.0},
             damping={"left_ankle":    10.0,
                      "right_ankle":   10.0},
-            armature = 0.001
+            armature = 0.065
         ),
         "spine": ImplicitActuatorCfg(
             joint_names_expr=["spine"],
-            effort_limit_sim=500.,
+            effort_limit_sim=300.,
             stiffness={"spine": 130.0},
             damping={"spine": 10.0},
-            armature = 0.001
+            armature = 0.065
 
         ),
         "arms": ImplicitActuatorCfg(
             joint_names_expr=['left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z', 'left_elbow',
                               'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'],
-            effort_limit_sim=500.,
+            effort_limit_sim=300.,
             stiffness={
-                "left_shoulder_y":  30.0,
-                "left_shoulder_x":  30.0,
-                "left_shoulder_z":  30.0,
-                "left_elbow":       30.0,
-                "right_shoulder_y": 30.0,
-                "right_shoulder_x": 30.0,
-                "right_shoulder_z": 30.0,
-                "right_elbow":      30.0,
+                "left_shoulder_y":  100.0,
+                "left_shoulder_x":  100.0,
+                "left_shoulder_z":  100.0,
+                "left_elbow":       100.0,
+                "right_shoulder_y": 100.0,
+                "right_shoulder_x": 100.0,
+                "right_shoulder_z": 100.0,
+                "right_elbow":      100.0,
             },
             damping={
-                "left_shoulder_y":  15.0,
-                "left_shoulder_x":  15.0,
-                "left_shoulder_z":  15.0,
-                "left_elbow":       15.0,
-                "right_shoulder_y": 15.0,
-                "right_shoulder_x": 15.0,
-                "right_shoulder_z": 15.0,
-                "right_elbow":      15.0,
+                "left_shoulder_y":  10.0,
+                "left_shoulder_x":  10.0,
+                "left_shoulder_z":  10.0,
+                "left_elbow":       10.0,
+                "right_shoulder_y": 10.0,
+                "right_shoulder_x": 10.0,
+                "right_shoulder_z": 10.0,
+                "right_elbow":      10.0,
             },
-            armature = 0.001
+            armature = 0.065
 
         ),
     },
@@ -137,8 +145,8 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
         physics_material=sim_utils.RigidBodyMaterialCfg(
             friction_combine_mode="average",
             restitution_combine_mode="average",
-            static_friction=1.0,
-            dynamic_friction=1.0,
+            static_friction=10.0,
+            dynamic_friction=10.0,
             restitution=0.5,
         ),
         visual_material = sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0)),
@@ -197,6 +205,15 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
+    reset_base = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {},
+            "velocity_range": {}
+        },
+    )
+
     reset_robot_joints = EventTerm(
         func=mdp.reset_joints_by_offset,
         mode="reset",
@@ -206,50 +223,53 @@ class EventCfg:
         },
     )
 
-    reset_joint_torque = EventTerm(
-        func=mdp.apply_external_force_torque,
-        mode='reset',
-        params={
-            'force_range': (-.3, .3),
-            'torque_range': (-.3, .3)
-        }
-    )
+    # reset_joint_torque = EventTerm(
+    #     func=mdp.apply_external_force_torque,
+    #     mode='reset',
+    #     params={
+    #         'force_range': (-.3, .3),
+    #         'torque_range': (-.3, .3)
+    #     }
+    # )
 
-    reset_root_velocity = EventTerm(
-        func=mdp.push_by_setting_velocity,
-        mode='reset',
-        params={
-            'velocity_range': {'x': (-0.65, 0.65),
-                               'y': (-0.65, 0.65)}
-        }
-    )
+    # reset_root_velocity = EventTerm(
+    #     func=mdp.push_by_setting_velocity,
+    #     mode='reset',
+    #     params={
+    #         'velocity_range': {'x': (-0.65, 0.65),
+    #                            'y': (-0.65, 0.65)}
+    #     }
+    # )
 
-    reset_base = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={
-            "pose_range": {"yaw": (-3.14, 3.14)},
-            "velocity_range": {
-                "x": (-0.65, 0.65),
-                "y": (-0.65, 0.65),
-                "z": (-0.65, 0.65),
-                "roll": (-0.5, 0.5),
-                "pitch": (-0.5, 0.5),
-                "yaw": (-0.5, 0.5),
-            },
-        },
-    )
+    # reset_base = EventTerm(
+    #     func=mdp.reset_root_state_uniform,
+    #     mode="reset",
+    #     params={
+    #         "pose_range": {"yaw": (-3.14, 3.14)},
+    #         "velocity_range": {
+    #             "x": (-0.65, 0.65),
+    #             "y": (-0.65, 0.65),
+    #             "z": (-0.65, 0.65),
+    #             "roll": (-0.5, 0.5),
+    #             "pitch": (-0.5, 0.5),
+    #             "yaw": (-0.5, 0.5),
+    #         },
+    #     },
+    # )
 
+
+    pass
 
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    alive = RewTerm(func=mdp.is_alive, weight=20.0)
+    alive = RewTerm(func=mdp.is_alive, weight=7.5)
     #termination_penalty = RewTerm(func=mdp.is_terminated,weight=0.0,)
     #upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
     #normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.5, params={'target': 0.0})
-    default_pose = RewTerm(func=mdp.default_pose_tracking, weight = -0.5, params={'threshold': 0.1})
+    default_pose = RewTerm(func=mdp.default_pose_tracking, weight = -0.5, params={'threshold': 0.0})
+    #stadning_pose = RewTerm(func=mdp.standing_pose_tracking, weight = -0.5)
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-3)
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-6)
     #action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
@@ -269,7 +289,7 @@ class TerminationsCfg:
     # time out
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
     # terminate if body part touches the ground
-    base_contact = DoneTerm(
+    unwanted_contact = DoneTerm(
         func=mdp.illegal_contact,
         params={"sensor_cfg": SceneEntityCfg("contact_forces", 
                                              body_names=['hip', 'connector0_3', 'connector0_4', 'connector0_5', 

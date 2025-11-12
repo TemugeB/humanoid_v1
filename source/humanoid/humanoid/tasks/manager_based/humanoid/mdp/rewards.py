@@ -369,6 +369,48 @@ class default_pose_tracking(ManagerTermBase):
 
         return torch.sum(torch.square(joint_pos * over_threshold), dim=1)
 
+
+class standing_pose_tracking(ManagerTermBase):
+
+    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
+        self.zero_pos_joints = [
+            'hip_left_x', 'hip_left_z', 'hip_left_y',
+            'hip_right_x', 'hip_right_z', 'hip_right_y',
+            'spine',
+            'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z',
+            'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
+        ]
+
+        asset : Articulation = env.scene[asset_cfg.name]
+        joint_inds = asset.find_joints(self.zero_pos_joints)[0]
+        self.zero_joint_inds = torch.tensor(joint_inds).reshape(-1)
+
+        self.non_zeros_joints = {
+            "hip_left_y":  -0.31,
+            "hip_right_y": 0.31,
+            "knee_left": 0.34,
+            "knee_right": -0.34, 
+            "left_ankle": -0.32,
+            "right_ankle": 0.32,
+        }
+    
+        joint_inds = asset.find_joints(self.non_zeros_joints.keys())[0]
+        self.non_zero_joint_inds = torch.tensor(joint_inds).reshape(-1)
+        self.non_zero_joint_targets = torch.tensor(list(self.non_zeros_joints.values()), device=env.device, dtype=torch.float32).reshape(1, -1)
+
+    def __call__(self, 
+                 env: ManagerBasedRLEnv, 
+                 asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+        
+        asset : Articulation = env.scene[asset_cfg.name]
+        joint_pos = asset.data.joint_pos[:, self.zero_joint_inds]
+        zero_joint_errors = torch.sum(torch.square(joint_pos), dim=1)
+
+        nonzero_joint_pos = asset.data.joint_pos[:, self.non_zero_joint_inds]
+        nonzero_joint_errors = torch.sum(torch.square(nonzero_joint_pos - self.non_zero_joint_targets), dim=1)
+
+        return zero_joint_errors + nonzero_joint_errors
+
 def joint_pos_target_l2(env: ManagerBasedRLEnv, target: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize joint position deviation from a target value."""
     # extract the used quantities (to enable type-hinting)
