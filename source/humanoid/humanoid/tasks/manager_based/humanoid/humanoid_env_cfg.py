@@ -218,8 +218,8 @@ class EventCfg:
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
-            "position_range": (-0.4, 0.4),
-            "velocity_range": (-0.4, 0.4),
+            "position_range": (-0.1, 0.1),
+            "velocity_range": (-0.1, 0.1),
         },
     )
 
@@ -264,7 +264,7 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    alive = RewTerm(func=mdp.is_alive, weight=7.5)
+    alive = RewTerm(func=mdp.is_alive, weight=1.0)
     #termination_penalty = RewTerm(func=mdp.is_terminated,weight=0.0,)
     #upright = RewTerm(func=mdp.upright_posture_bonus, weight=0.1, params={"threshold": 0.93})
     #normal_pose = RewTerm(func=mdp.joint_pos_target_l2, weight=-0.5, params={'target': 0.0})
@@ -277,7 +277,7 @@ class RewardsCfg:
     #action_accel_l2 = RewTerm(func=mdp.action_acc_l2, weight=-0.45)
     #root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -3.0)
     #root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
-    feet_slide = RewTerm(func=mdp.feet_slide, weight = -.01, params={
+    feet_slide = RewTerm(func=mdp.feet_slide, weight = -1., params={
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
             "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
     #ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)

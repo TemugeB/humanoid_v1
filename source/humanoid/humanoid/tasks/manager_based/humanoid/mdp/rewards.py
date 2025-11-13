@@ -336,26 +336,34 @@ class default_pose_tracking(ManagerTermBase):
 
     def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
 
-        # self.target_joints = [
-        #     'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left', 'left_ankle',
-        #     'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right', 'right_ankle',
-        #     'spine',
-        #     'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z',
-        #     'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
-        # ]
-
-        self.target_joints = [
-            'hip_left_x', 'hip_left_z',
-            'hip_right_x', 'hip_right_z',
-            'spine',
-            'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z',
-            'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
-        ]
+        default_pose = {
+            'hip_left_x'        : 0.0, 
+            'hip_left_z'        : 0.0,
+            'hip_left_y'        : 0.0,
+            'knee_left'         : 0.0,
+            'left_ankle'        : 0.0,
+            'hip_right_x'       : 0.0, 
+            'hip_right_z'       : 0.0,
+            'hip_right_y'       : 0.0,
+            'knee_right'        : 0.0,
+            'right_ankle'       : 0.0,
+            'spine'             : 0.0,
+            'left_shoulder_y'   : 0.0, 
+            'left_shoulder_x'   : 0.0, 
+            'left_shoulder_z'   : 0.0,
+            'right_shoulder_y'  : 0.0, 
+            'right_shoulder_x'  : 0.0, 
+            'right_shoulder_z'  : 0.0,    
+        }
 
         asset : Articulation = env.scene[asset_cfg.name]
-        #joint_inds = [asset.find_joints([joint_name])[0] for joint_name in self.target_joints]
-        joint_inds = asset.find_joints(self.target_joints)[0]
+        
+        #get the joint indices
+        joint_inds = asset.find_joints(default_pose.keys())[0]
         self.joint_inds = torch.tensor(joint_inds).reshape(-1)
+        #get the target joint values for each joint
+        self.joint_targets = torch.tensor(list(default_pose.values()), device=env.device, dtype=torch.float32).reshape(1, -1)
+
 
     def __call__(self, 
                  env: ManagerBasedRLEnv, 
@@ -365,51 +373,10 @@ class default_pose_tracking(ManagerTermBase):
         asset : Articulation = env.scene[asset_cfg.name]
         joint_pos = asset.data.joint_pos[:, self.joint_inds]
         #which ones are over threshold
-        over_threshold = torch.abs(joint_pos) > threshold
+        joint_errors = joint_pos - self.joint_targets # [num_envs, num_joints]
+        over_threshold = torch.abs(joint_errors) > threshold
 
-        return torch.sum(torch.square(joint_pos * over_threshold), dim=1)
-
-
-class standing_pose_tracking(ManagerTermBase):
-
-    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
-        self.zero_pos_joints = [
-            'hip_left_x', 'hip_left_z', 'hip_left_y',
-            'hip_right_x', 'hip_right_z', 'hip_right_y',
-            'spine',
-            'left_shoulder_y', 'left_shoulder_x', 'left_shoulder_z',
-            'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z'    
-        ]
-
-        asset : Articulation = env.scene[asset_cfg.name]
-        joint_inds = asset.find_joints(self.zero_pos_joints)[0]
-        self.zero_joint_inds = torch.tensor(joint_inds).reshape(-1)
-
-        self.non_zeros_joints = {
-            "hip_left_y":  -0.31,
-            "hip_right_y": 0.31,
-            "knee_left": 0.34,
-            "knee_right": -0.34, 
-            "left_ankle": -0.32,
-            "right_ankle": 0.32,
-        }
-    
-        joint_inds = asset.find_joints(self.non_zeros_joints.keys())[0]
-        self.non_zero_joint_inds = torch.tensor(joint_inds).reshape(-1)
-        self.non_zero_joint_targets = torch.tensor(list(self.non_zeros_joints.values()), device=env.device, dtype=torch.float32).reshape(1, -1)
-
-    def __call__(self, 
-                 env: ManagerBasedRLEnv, 
-                 asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
-        
-        asset : Articulation = env.scene[asset_cfg.name]
-        joint_pos = asset.data.joint_pos[:, self.zero_joint_inds]
-        zero_joint_errors = torch.sum(torch.square(joint_pos), dim=1)
-
-        nonzero_joint_pos = asset.data.joint_pos[:, self.non_zero_joint_inds]
-        nonzero_joint_errors = torch.sum(torch.square(nonzero_joint_pos - self.non_zero_joint_targets), dim=1)
-
-        return zero_joint_errors + nonzero_joint_errors
+        return torch.sum(torch.square(joint_errors * over_threshold), dim=1)
 
 def joint_pos_target_l2(env: ManagerBasedRLEnv, target: float, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize joint position deviation from a target value."""
