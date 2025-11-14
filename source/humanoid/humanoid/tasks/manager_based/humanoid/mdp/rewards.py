@@ -453,3 +453,88 @@ def is_terminated(env: ManagerBasedRLEnv) -> torch.Tensor:
     return env.termination_manager.terminated.float()
 
 
+class compound_reward(ManagerTermBase):
+
+    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
+
+        default_pose = {
+            'hip_left_x'        : 0.0, 
+            'hip_left_z'        : 0.0,
+            'hip_left_y'        : 0.0,
+            'knee_left'         : 0.0,
+            'left_ankle'        : 0.0,
+            'hip_right_x'       : 0.0, 
+            'hip_right_z'       : 0.0,
+            'hip_right_y'       : 0.0,
+            'knee_right'        : 0.0,
+            'right_ankle'       : 0.0,
+            'spine'             : 0.0,
+            'left_shoulder_y'   : 0.0, 
+            'left_shoulder_x'   : 0.0, 
+            'left_shoulder_z'   : 0.0,
+            'right_shoulder_y'  : 0.0, 
+            'right_shoulder_x'  : 0.0, 
+            'right_shoulder_z'  : 0.0,    
+        }
+
+        self.asset : Articulation = env.scene[asset_cfg.name]
+        
+        #get the joint indices
+        joint_inds = self.asset.find_joints(default_pose.keys())[0]
+        self.joint_inds = torch.tensor(joint_inds).reshape(-1)
+        #get the target joint values for each joint
+        self.joint_targets = torch.tensor(list(default_pose.values()), device=env.device, dtype=torch.float32).reshape(1, -1)
+
+        #default weights of the reward terms
+        self.term_decay = {
+            'alive':        torch.ones((env.num_envs,), device=env.device),
+            'torque_usage': torch.ones((env.num_envs,), device=env.device),
+            'joint_accel':  torch.ones((env.num_envs,), device=env.device),
+            'action_rate':  torch.ones((env.num_envs,), device=env.device),
+            'pose_tracking':torch.ones((env.num_envs,), device=env.device),
+        }
+
+    def __call__(self, 
+                 env: ManagerBasedRLEnv, 
+                 threshold: float,
+                 asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+        
+        joint_pos = self.asset.data.joint_pos[:, self.joint_inds]
+        joint_errors = joint_pos - self.joint_targets # [num_envs, num_joints]
+        pose_tracking = torch.mean(torch.square(joint_errors), dim=1)
+        
+        #modify the reward weight for this iteration
+        self._update_weight_decay(env, pose_tracking, threshold)
+
+        #reward terms
+        alive =         10.0 *   self.term_decay['alive'] * mdp.is_alive(env)
+        torque_usage = -1e-3 *   self.term_decay['torque_usage'] * mdp.joint_torques_l2(env)
+        joint_accel  = -2.5e-6 * self.term_decay['joint_accel'] * mdp.joint_acc_l2(env)
+        action_rate =  -1.5 *    self.term_decay['action_rate'] * mdp.action_rate_l2(env)
+        pose_tracking= -2.0 *    self.term_decay['pose_tracking'] * pose_tracking
+
+        return alive + torque_usage + joint_accel + action_rate + pose_tracking
+    
+    def _update_weight_decay(self, env, pose_tracking, threshold):
+        
+        #don't modify rewards early in training
+        if env.common_step_counter < 10_000_000//env.num_envs:
+            return
+
+        #reset to default values
+        self.term_decay['alive'].fill_(1.0)
+        self.term_decay['torque_usage'].fill_(0.1)
+        self.term_decay['joint_accel'].fill_(0.1)
+        self.term_decay['action_rate'].fill_(0.1)
+        self.term_decay['pose_tracking'].fill_(1.0)
+
+        #For robots near default pose, enable penalty for action rate
+        under_threshold = pose_tracking < threshold
+        self.term_decay['torque_usage'][under_threshold].fill_(1.0)
+        self.term_decay['joint_accel'][under_threshold].fill_(1.0)
+        self.term_decay['action_rate'][under_threshold].fill_(1.0)
+
+        #disable alive reward
+        self.term_decay['alive'][under_threshold].fill_(0.05)
+
+        return
