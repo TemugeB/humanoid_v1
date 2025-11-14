@@ -537,4 +537,7 @@ class compound_reward(ManagerTermBase):
         #disable alive reward
         self.term_decay['alive'][under_threshold].fill_(0.05)
 
+        if env.common_step_counter%100 == 0:
+            print('average under threshold count: ', torch.sum(under_threshold))
+
         return
