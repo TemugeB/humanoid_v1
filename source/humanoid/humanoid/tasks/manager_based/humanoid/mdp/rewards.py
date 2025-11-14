@@ -504,7 +504,7 @@ class compound_reward(ManagerTermBase):
         pose_tracking = torch.mean(torch.square(joint_errors), dim=1)
         
         #modify the reward weight for this iteration
-        self._update_weight_decay(env, pose_tracking, threshold)
+        #self._update_weight_decay(env, pose_tracking, threshold)
 
         #reward terms
         alive =         10.0 *   self.term_decay['alive'] * mdp.is_alive(env)
