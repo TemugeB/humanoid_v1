@@ -26,7 +26,7 @@ joints = [
 ]
 
 usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
-usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
+#usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -269,7 +269,7 @@ class RewardsCfg:
     #joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-6)
     #action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.5)
     #default_pose = RewTerm(func=mdp.default_pose_tracking, weight = -0.5, params={'threshold': 0.0})
-    compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 3e-2})
+    compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 5e-2})
     
     feet_slide = RewTerm(func=mdp.feet_slide, weight = -0.1, params={
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
@@ -314,7 +314,7 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
         """Post initialization."""
         # general settings
         self.decimation = 4
-        self.episode_length_s = 8
+        self.episode_length_s = 12.0
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
         # simulation settings

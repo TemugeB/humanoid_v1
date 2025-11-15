@@ -485,7 +485,16 @@ class compound_reward(ManagerTermBase):
         #get the target joint values for each joint
         self.joint_targets = torch.tensor(list(default_pose.values()), device=env.device, dtype=torch.float32).reshape(1, -1)
 
-        #default weights of the reward terms
+        #default reward weights.
+        self.weights = {
+            'alive': 10.0,
+            'torque_usage': -1e-3,
+            'joint_accel': -2.5e-6,
+            'action_rate': -1.5,
+            'pose_tracking': -2.0
+        }
+        
+        #container to hold the decayed weights. Initializing here is just an optimization.
         self.term_decay = {
             'alive':        torch.ones((env.num_envs,), device=env.device),
             'torque_usage': torch.ones((env.num_envs,), device=env.device),
@@ -494,50 +503,86 @@ class compound_reward(ManagerTermBase):
             'pose_tracking':torch.ones((env.num_envs,), device=env.device),
         }
 
+        self.current_weights = {
+            'alive': torch.tensor([1.0, 0.05]),        #[current_value, final_value]
+            'torque_usage': torch.tensor([1.0, 10.0]), 
+            'joint_accel': torch.tensor([1.0, 10.0]),
+            'action_rate': torch.tensor([1.0, 10.0]),
+            'pose_tracking': torch.tensor([1.0, 2.5])
+        }
+
     def __call__(self, 
                  env: ManagerBasedRLEnv, 
-                 threshold: float,
-                 asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+                 threshold: float) -> torch.Tensor:
         
         joint_pos = self.asset.data.joint_pos[:, self.joint_inds]
         joint_errors = joint_pos - self.joint_targets # [num_envs, num_joints]
         pose_tracking = torch.mean(torch.square(joint_errors), dim=1)
         
         #modify the reward weight for this iteration
-        #self._update_weight_decay(env, pose_tracking, threshold)
+        self._update_weight_decay(env, pose_tracking, threshold)
 
         #reward terms
-        alive =         10.0 *   self.term_decay['alive'] * mdp.is_alive(env)
-        torque_usage = -1e-3 *   self.term_decay['torque_usage'] * mdp.joint_torques_l2(env)
-        joint_accel  = -2.5e-6 * self.term_decay['joint_accel'] * mdp.joint_acc_l2(env)
-        action_rate =  -1.5 *    self.term_decay['action_rate'] * mdp.action_rate_l2(env)
-        pose_tracking= -2.0 *    self.term_decay['pose_tracking'] * pose_tracking
+        alive =         self.weights['alive']         * self.term_decay['alive'] * mdp.is_alive(env)
+        torque_usage =  self.weights['torque_usage']  * self.term_decay['torque_usage'] * mdp.joint_torques_l2(env)
+        joint_accel  =  self.weights['joint_accel']   * self.term_decay['joint_accel'] * mdp.joint_acc_l2(env)
+        action_rate =   self.weights['action_rate']   * self.term_decay['action_rate'] * mdp.action_rate_l2(env)
+        pose_tracking=  self.weights['pose_tracking'] * self.term_decay['pose_tracking'] * pose_tracking
 
         return alive + torque_usage + joint_accel + action_rate + pose_tracking
     
     def _update_weight_decay(self, env, pose_tracking, threshold):
         
         #don't modify rewards early in training
-        if env.common_step_counter < 10_000_000//env.num_envs:
+        if env.common_step_counter < 200_000_000//env.num_envs:
             return
 
-        #reset to default values
+        #reset to normal weights. This ensures that any robot not near default pose will get regular rewards
         self.term_decay['alive'].fill_(1.0)
-        self.term_decay['torque_usage'].fill_(0.1)
-        self.term_decay['joint_accel'].fill_(0.1)
-        self.term_decay['action_rate'].fill_(0.1)
+        self.term_decay['torque_usage'].fill_(1.0)
+        self.term_decay['joint_accel'].fill_(1.0)
+        self.term_decay['action_rate'].fill_(1.0)
         self.term_decay['pose_tracking'].fill_(1.0)
+
+        #every 10_000_000 steps, modify the current reward weights
+        if env.common_step_counter % 10_000_000 == 0:
+            #alive reward is reduced            
+            current_alive = self.current_weights['alive'][0] 
+            new_alive = torch.clamp(current_alive - 0.05, self.current_weights['alive'][1], 1.0)
+            self.current_weights['alive'][0] = new_alive 
+
+            # --- TORQUE_USAGE (Increasing) ---
+            current_torque = self.current_weights['torque_usage'][0]
+            new_torque = torch.clamp(current_torque + 0.1, 1.0, self.current_weights['torque_usage'][1])
+            self.current_weights['torque_usage'][0] = new_torque
+
+            # --- JOINT_ACCEL (Increasing) ---
+            current_accel = self.current_weights['joint_accel'][0]
+            new_accel = torch.clamp(current_accel + 0.1, 1.0, self.current_weights['joint_accel'][1])
+            self.current_weights['joint_accel'][0] = new_accel
+
+            # --- ACTION_RATE (Increasing) ---
+            current_action_rate = self.current_weights['action_rate'][0]
+            new_action_rate = torch.clamp(current_action_rate + 0.1, 1.0, self.current_weights['action_rate'][1])
+            self.current_weights['action_rate'][0] = new_action_rate
+
+            # --- POSE_TRACKING (Increasing) ---
+            current_pose_tracking = self.current_weights['pose_tracking'][0]
+            new_pose_tracking = torch.clamp(current_pose_tracking + 0.05, 1.0, self.current_weights['pose_tracking'][1])
+            self.current_weights['pose_tracking'][0] = new_pose_tracking
+
 
         #For robots near default pose, enable penalty for action rate
         under_threshold = pose_tracking < threshold
-        self.term_decay['torque_usage'][under_threshold].fill_(1.0)
-        self.term_decay['joint_accel'][under_threshold].fill_(1.0)
-        self.term_decay['action_rate'][under_threshold].fill_(1.0)
 
-        #disable alive reward
-        self.term_decay['alive'][under_threshold].fill_(0.05)
+        self.term_decay['alive'][under_threshold].fill_(self.current_weights['alive'][0])
+        self.term_decay['torque_usage'][under_threshold].fill_(self.current_weights['torque_usage'][0])
+        self.term_decay['joint_accel'][under_threshold].fill_(self.current_weights['joint_accel'][0])
+        self.term_decay['action_rate'][under_threshold].fill_(self.current_weights['action_rate'][0])
+        self.term_decay['pose_tracking'][under_threshold].fill_(self.current_weights['pose_tracking'][0])
 
-        if env.common_step_counter%100 == 0:
+
+        if env.common_step_counter%1000 == 0:
             print('average under threshold count: ', torch.sum(under_threshold))
 
         return
