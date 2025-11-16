@@ -140,7 +140,7 @@ class power_consumption(ManagerTermBase):
         self.gear_ratio_scaled = self.gear_ratio / torch.max(self.gear_ratio)
 
     def __call__(
-        self, env: ManagerBasedRLEnv, gear_ratio: dict[str, float], asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+        self, env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
     ) -> torch.Tensor:
         # extract the used quantities (to enable type-hinting)
         asset: Articulation = env.scene[asset_cfg.name]
@@ -505,10 +505,10 @@ class compound_reward(ManagerTermBase):
 
         self.current_weights = {
             'alive': torch.tensor([1.0, 0.05]),        #[current_value, final_value]
-            'torque_usage': torch.tensor([1.0, 10.0]), 
-            'joint_accel': torch.tensor([1.0, 10.0]),
-            'action_rate': torch.tensor([1.0, 10.0]),
-            'pose_tracking': torch.tensor([1.0, 2.5])
+            'torque_usage': torch.tensor([1.0, 15.0]), 
+            'joint_accel': torch.tensor([1.0, 15.0]),
+            'action_rate': torch.tensor([1.0, 15.0]),
+            'pose_tracking': torch.tensor([1.0, 5.0])
         }
 
     def __call__(self, 
@@ -534,7 +534,7 @@ class compound_reward(ManagerTermBase):
     def _update_weight_decay(self, env, pose_tracking, threshold):
         
         #don't modify rewards early in training
-        if env.common_step_counter < 200_000_000//env.num_envs:
+        if env.common_step_counter < (250_000_000//env.num_envs):
             return
 
         #reset to normal weights. This ensures that any robot not near default pose will get regular rewards
@@ -545,7 +545,7 @@ class compound_reward(ManagerTermBase):
         self.term_decay['pose_tracking'].fill_(1.0)
 
         #every 10_000_000 steps, modify the current reward weights
-        if env.common_step_counter % 10_000_000 == 0:
+        if env.common_step_counter % (10_000_000//env.num_envs) == 0:
             #alive reward is reduced            
             current_alive = self.current_weights['alive'][0] 
             new_alive = torch.clamp(current_alive - 0.05, self.current_weights['alive'][1], 1.0)
@@ -571,7 +571,6 @@ class compound_reward(ManagerTermBase):
             new_pose_tracking = torch.clamp(current_pose_tracking + 0.05, 1.0, self.current_weights['pose_tracking'][1])
             self.current_weights['pose_tracking'][0] = new_pose_tracking
 
-
         #For robots near default pose, enable penalty for action rate
         under_threshold = pose_tracking < threshold
 
@@ -582,7 +581,8 @@ class compound_reward(ManagerTermBase):
         self.term_decay['pose_tracking'][under_threshold].fill_(self.current_weights['pose_tracking'][0])
 
 
-        if env.common_step_counter%1000 == 0:
+        if env.common_step_counter%100 == 0:
             print('average under threshold count: ', torch.sum(under_threshold))
+            print('current weight targets: ', self.current_weights)
 
         return
