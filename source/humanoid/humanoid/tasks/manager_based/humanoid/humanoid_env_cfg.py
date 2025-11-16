@@ -42,7 +42,7 @@ HUMANOID_CONFIG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=True, solver_position_iteration_count=4, solver_velocity_iteration_count=4
+            enabled_self_collisions=False, solver_position_iteration_count=4, solver_velocity_iteration_count=4
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -220,6 +220,10 @@ class EventCfg:
         params={
             "position_range": (-0.4, 0.4),
             "velocity_range": (-0.4, 0.4),
+            "asset_cfg": SceneEntityCfg("robot", joint_names=[                
+                'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left',
+                'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right',
+                'left_ankle', 'right_ankle', 'spine'])
         },
     )
 
@@ -228,7 +232,11 @@ class EventCfg:
         mode='reset',
         params={
             'force_range': (-.3, .3),
-            'torque_range': (-.3, .3)
+            'torque_range': (-.3, .3),
+            "asset_cfg": SceneEntityCfg("robot", joint_names=[                
+                'hip_left_y', 'hip_left_x', 'hip_left_z', 'knee_left',
+                'hip_right_y', 'hip_right_x', 'hip_right_z', 'knee_right',
+                'left_ankle', 'right_ankle', 'spine'])
         }
     )
 
@@ -314,7 +322,7 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
         """Post initialization."""
         # general settings
         self.decimation = 4
-        self.episode_length_s = 12.0
+        self.episode_length_s = 6.0
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
         # simulation settings

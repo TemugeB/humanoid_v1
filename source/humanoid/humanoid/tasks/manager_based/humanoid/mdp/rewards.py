@@ -504,11 +504,11 @@ class compound_reward(ManagerTermBase):
         }
 
         self.current_weights = {
-            'alive': torch.tensor([1.0, 0.05]),        #[current_value, final_value]
-            'torque_usage': torch.tensor([1.0, 15.0]), 
-            'joint_accel': torch.tensor([1.0, 15.0]),
-            'action_rate': torch.tensor([1.0, 15.0]),
-            'pose_tracking': torch.tensor([1.0, 5.0])
+            'alive': torch.tensor([1.0, 0.5]),        #[current_value, final_value]
+            'torque_usage': torch.tensor([1.0, 5.0]), 
+            'joint_accel': torch.tensor([1.0, 5.0]),
+            'action_rate': torch.tensor([1.0, 5.0]),
+            'pose_tracking': torch.tensor([1.0, 2.5])
         }
 
     def __call__(self, 
@@ -520,7 +520,7 @@ class compound_reward(ManagerTermBase):
         pose_tracking = torch.mean(torch.square(joint_errors), dim=1)
         
         #modify the reward weight for this iteration
-        self._update_weight_decay(env, pose_tracking, threshold)
+        #self._update_weight_decay(env, pose_tracking, threshold)
 
         #reward terms
         alive =         self.weights['alive']         * self.term_decay['alive'] * mdp.is_alive(env)
@@ -533,56 +533,37 @@ class compound_reward(ManagerTermBase):
     
     def _update_weight_decay(self, env, pose_tracking, threshold):
         
-        #don't modify rewards early in training
-        if env.common_step_counter < (250_000_000//env.num_envs):
-            return
+        #common_step_counter is the number of policy updates.
+        total_steps = env.common_step_counter * env.num_envs
+        
+        # Define curriculum parameters based on total steps
+        P_start = 250_000_000  # Start curriculum after 250M total steps
+        P_duration = 500_000_000 # Decay smoothly over the next 500M total steps
 
-        #reset to normal weights. This ensures that any robot not near default pose will get regular rewards
-        self.term_decay['alive'].fill_(1.0)
-        self.term_decay['torque_usage'].fill_(1.0)
-        self.term_decay['joint_accel'].fill_(1.0)
-        self.term_decay['action_rate'].fill_(1.0)
-        self.term_decay['pose_tracking'].fill_(1.0)
+        # alpha smoothly increases from 0.0 to 1.0 during the curriculum
+        current_steps_in_curriculum = torch.clamp(
+            torch.tensor(float(total_steps - P_start), device=env.device),
+            0.0,
+            float(P_duration)
+        )
+        alpha = current_steps_in_curriculum / P_duration
 
-        #every 10_000_000 steps, modify the current reward weights
-        if env.common_step_counter % (10_000_000//env.num_envs) == 0:
-            #alive reward is reduced            
-            current_alive = self.current_weights['alive'][0] 
-            new_alive = torch.clamp(current_alive - 0.05, self.current_weights['alive'][1], 1.0)
-            self.current_weights['alive'][0] = new_alive 
+        for key in self.current_weights.keys():
+            # Get start weight (1.0) and final weight (self.current_weights[key][1])
+            start_w = 1.0
+            # Ensure final_w is a standard Python float for calculation
+            final_w = self.current_weights[key][1].item() 
 
-            # --- TORQUE_USAGE (Increasing) ---
-            current_torque = self.current_weights['torque_usage'][0]
-            new_torque = torch.clamp(current_torque + 0.1, 1.0, self.current_weights['torque_usage'][1])
-            self.current_weights['torque_usage'][0] = new_torque
-
-            # --- JOINT_ACCEL (Increasing) ---
-            current_accel = self.current_weights['joint_accel'][0]
-            new_accel = torch.clamp(current_accel + 0.1, 1.0, self.current_weights['joint_accel'][1])
-            self.current_weights['joint_accel'][0] = new_accel
-
-            # --- ACTION_RATE (Increasing) ---
-            current_action_rate = self.current_weights['action_rate'][0]
-            new_action_rate = torch.clamp(current_action_rate + 0.1, 1.0, self.current_weights['action_rate'][1])
-            self.current_weights['action_rate'][0] = new_action_rate
-
-            # --- POSE_TRACKING (Increasing) ---
-            current_pose_tracking = self.current_weights['pose_tracking'][0]
-            new_pose_tracking = torch.clamp(current_pose_tracking + 0.05, 1.0, self.current_weights['pose_tracking'][1])
-            self.current_weights['pose_tracking'][0] = new_pose_tracking
-
-        #For robots near default pose, enable penalty for action rate
-        under_threshold = pose_tracking < threshold
-
-        self.term_decay['alive'][under_threshold].fill_(self.current_weights['alive'][0])
-        self.term_decay['torque_usage'][under_threshold].fill_(self.current_weights['torque_usage'][0])
-        self.term_decay['joint_accel'][under_threshold].fill_(self.current_weights['joint_accel'][0])
-        self.term_decay['action_rate'][under_threshold].fill_(self.current_weights['action_rate'][0])
-        self.term_decay['pose_tracking'][under_threshold].fill_(self.current_weights['pose_tracking'][0])
-
-
-        if env.common_step_counter%100 == 0:
-            print('average under threshold count: ', torch.sum(under_threshold))
-            print('current weight targets: ', self.current_weights)
+            # Linear Interpolation: (1 - alpha) * start + alpha * final
+            # Calculate the new target weight
+            new_weight = (1.0 - alpha) * start_w + alpha * final_w
+            
+            # Update the decay tensor for ALL environments using fill_ (highly efficient)
+            self.term_decay[key].fill_(new_weight)
+    
+        policy_steps = total_steps // env.num_envs
+        if policy_steps % (500_000_000 // env.num_envs // 50) == 0:
+             print(f"Total Steps: {total_steps}. Curriculum Alpha: {alpha.item():.4f}. Alive Weight: {self.term_decay['alive'][0].item():.4f}")
 
         return
+    
