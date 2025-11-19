@@ -413,6 +413,7 @@ class action_acc_l2(ManagerTermBase):
         action_diff = current_action - 2 * self.last_action + self.last_last_action
         reward_term = torch.square(torch.sum(action_diff, dim=-1))
 
+        print(self.last_last_action[0][0], self.last_action[0][0], current_action[0][0])
         self.last_last_action = self.last_action
         self.last_action = current_action
 
@@ -504,11 +505,11 @@ class compound_reward(ManagerTermBase):
         }
 
         self.current_weights = {
-            'alive': torch.tensor([1.0, 0.5]),        #[current_value, final_value]
-            'torque_usage': torch.tensor([1.0, 5.0]), 
-            'joint_accel': torch.tensor([1.0, 5.0]),
-            'action_rate': torch.tensor([1.0, 5.0]),
-            'pose_tracking': torch.tensor([1.0, 2.5])
+            'alive': torch.tensor([1.0, 1.0]),        #[current_value, final_value]
+            'torque_usage': torch.tensor([1.0, 1.0]), 
+            'joint_accel': torch.tensor([1.0, 1.0]),
+            'action_rate': torch.tensor([1.0, 1.0]),
+            'pose_tracking': torch.tensor([1.0, 5.0])
         }
 
     def __call__(self, 
@@ -520,7 +521,7 @@ class compound_reward(ManagerTermBase):
         pose_tracking = torch.mean(torch.square(joint_errors), dim=1)
         
         #modify the reward weight for this iteration
-        #self._update_weight_decay(env, pose_tracking, threshold)
+        self._update_weight_decay(env, pose_tracking, threshold)
 
         #reward terms
         alive =         self.weights['alive']         * self.term_decay['alive'] * mdp.is_alive(env)
@@ -538,7 +539,7 @@ class compound_reward(ManagerTermBase):
         
         # Define curriculum parameters based on total steps
         P_start = 250_000_000  # Start curriculum after 250M total steps
-        P_duration = 500_000_000 # Decay smoothly over the next 500M total steps
+        P_duration = 750_000_000 # Decay smoothly over the next 500M total steps
 
         # alpha smoothly increases from 0.0 to 1.0 during the curriculum
         current_steps_in_curriculum = torch.clamp(
