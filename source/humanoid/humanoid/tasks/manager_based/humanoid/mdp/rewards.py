@@ -475,7 +475,9 @@ class compound_reward(ManagerTermBase):
             'left_shoulder_z'   : 0.0,
             'right_shoulder_y'  : 0.0, 
             'right_shoulder_x'  : 0.0, 
-            'right_shoulder_z'  : 0.0,    
+            'right_shoulder_z'  : 0.0, 
+            'left_elbow'        : 0.0,
+            'right_elbow'       : 0.0,   
         }
 
         self.asset : Articulation = env.scene[asset_cfg.name]

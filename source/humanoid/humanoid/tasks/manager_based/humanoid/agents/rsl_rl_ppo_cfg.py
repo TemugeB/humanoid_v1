@@ -28,10 +28,10 @@ class PPORunnerCfg(RslRlOnPolicyRunnerCfg):
         entropy_coef=0.000,
         num_learning_epochs=1,
         num_mini_batches=4,
-        learning_rate=1.0e-4,
+        learning_rate=1.0e-5,
         schedule="adaptive",
         gamma=0.99,
         lam=0.95,
-        desired_kl=0.01,
+        desired_kl=0.001,
         max_grad_norm=1.0,
     )
