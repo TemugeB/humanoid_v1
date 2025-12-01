@@ -1,0 +1,1223 @@
+<?xml version="1.0" ?>
+<!-- Generated using onshape-to-robot -->
+<!-- Onshape https://cad.onshape.com/documents/06688c54d9f33b1df3ff96fa/w/bd34902b55e37a044bc3683c/e/d011f94fe5533725f802c3ea -->
+<robot name="humanoid">
+  
+  <!--Materials-->
+  <material name="motor_mat">
+    <color rgba="1.0 0.1 0.1 1"/>
+  </material>
+  <material name="connector_mat">
+    <color rgba="0.10 0.10 0.10 1"/>
+  </material>
+  <material name="limb_mat">
+    <color rgba="0.10 0.10 0.10 1"/>
+  </material>
+  <material name="body_mat">
+    <color rgba="0.988 0.988 0.902 1"/>
+  </material>
+
+  <!-- Link hip -->
+  <link name="hip">
+    <inertial>
+      <origin xyz="-0.0727621 -9.80268e-09 0.0052993" rpy="0 0 0"/>
+      <mass value="3.89945"/>
+      <inertia ixx="0.014136" ixy="3.14405e-09" ixz="-0.000317995" iyy="0.0105889" iyz="3.69433e-10" izz="0.0125774"/>
+    </inertial>
+    <!-- Part big_motor -->
+    <visual>
+      <origin xyz="-0.0750228 0.07 -0.0230023" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.0750228 0.07 -0.0230023" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_2 -->
+    <visual>
+      <origin xyz="-0.0750228 -0.07 -0.0230023" rpy="-1.5708 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.0750228 -0.07 -0.0230023" rpy="-1.5708 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part hip -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/hip.stl"/>
+      </geometry>
+      <material name="body_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/hip.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_3 -->
+    <visual>
+      <origin xyz="-0.0707505 0 0.075" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.0707505 0 0.075" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector0 -->
+  <link name="connector0">
+    <inertial>
+      <origin xyz="-0.00178585 -0.00977757 -0.0525704" rpy="0 0 0"/>
+      <mass value="0.759712"/>
+      <inertia ixx="0.00106697" ixy="-2.27622e-06" ixz="-7.40439e-06" iyy="0.000716195" iyz="-6.45966e-05" izz="0.00058095"/>
+    </inertial>
+    <!-- Part big_motor_4 -->
+    <visual>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="1.5708 1.85037e-16 1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="1.5708 1.85037e-16 1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector1 -->
+    <visual>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector0 -->
+    <visual>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector2 -->
+  <link name="connector2">
+    <inertial>
+      <origin xyz="-0.070879 -3.98452e-10 0.016405" rpy="0 0 0"/>
+      <mass value="0.768711"/>
+      <inertia ixx="0.000834738" ixy="-8.46017e-12" ixz="3.24212e-05" iyy="0.00100733" iyz="1.82259e-13" izz="0.000953625"/>
+    </inertial>
+    <!-- Part connector2 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector4 -->
+    <visual>
+      <origin xyz="-0.034 0 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector4.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.034 0 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector4.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_5 -->
+    <visual>
+      <origin xyz="-0.098 0 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.098 0 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector3 -->
+  <link name="connector3">
+    <inertial>
+      <origin xyz="-5.84414e-05 -0.00128501 -0.112644" rpy="0 0 0"/>
+      <mass value="0.935207"/>
+      <inertia ixx="0.00275872" ixy="-1.53233e-08" ixz="-1.05697e-06" iyy="0.00308647" iyz="-3.76162e-05" izz="0.000568309"/>
+    </inertial>
+    <!-- Part connector6 -->
+    <visual>
+      <origin xyz="-7.10983e-05 -0.0125 -0.144" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector6.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-7.10983e-05 -0.0125 -0.144" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector6.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector3 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector3.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector3.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part thigh_bone -->
+    <visual>
+      <origin xyz="0.000307787 0 -0.082" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/thigh_bone.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.000307787 0 -0.082" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/thigh_bone.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_6 -->
+    <visual>
+      <origin xyz="-7.10983e-05 0.0135 -0.144" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-7.10983e-05 0.0135 -0.144" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector2_2 -->
+  <link name="connector2_2">
+    <inertial>
+      <origin xyz="-7.67692e-05 -0.155915 0.0167959" rpy="0 0 0"/>
+      <mass value="0.650858"/>
+      <inertia ixx="0.00622527" ixy="-4.76015e-06" ixz="7.24798e-08" iyy="0.000251593" iyz="0.000111598" izz="0.00612623"/>
+    </inertial>
+    <!-- Part connector5 -->
+    <visual>
+      <origin xyz="-0.000192408 -0.28 0.029" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.000192408 -0.28 0.029" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part shin_bone -->
+    <visual>
+      <origin xyz="0.000202982 -0.245 0.017" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/shin_bone.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.000202982 -0.245 0.017" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/shin_bone.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector2_2 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part small_motor -->
+    <visual>
+      <origin xyz="-0.000192408 -0.28 0.00499998" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.000192408 -0.28 0.00499998" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link shoes -->
+  <link name="shoes">
+    <inertial>
+      <origin xyz="0.0407995 -0.0301209 0.0170043" rpy="0 0 0"/>
+      <mass value="0.336504"/>
+      <inertia ixx="0.000183453" ixy="1.91792e-05" ixz="-7.71443e-08" iyy="0.000613076" iyz="6.74133e-09" izz="0.000571959"/>
+    </inertial>
+    <!-- Part shoes -->
+    <visual>
+      <origin xyz="0.00582733 0.0081512 -0.013" rpy="3.14159 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/shoes.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.00582733 0.0081512 -0.013" rpy="3.14159 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/shoes.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from connector2_2 to shoes -->
+  <joint name="left_ankle" type="revolute">
+    <origin xyz="-0.000192408 -0.28 -1.62227e-08" rpy="0 -0 0"/>
+    <parent link="connector2_2"/>
+    <child link="shoes"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-0.7" upper="0.6"/>
+  </joint>
+  <!-- Joint from connector3 to connector2_2 -->
+  <joint name="knee_left" type="revolute">
+    <origin xyz="-7.10983e-05 0.0155 -0.144" rpy="1.5708 -0 0"/>
+    <parent link="connector3"/>
+    <child link="connector2_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.85" upper="0.1"/>
+  </joint>
+  <!-- Joint from connector2 to connector3 -->
+  <joint name="hip_left_z" type="revolute">
+    <origin xyz="-0.1 0 0.017" rpy="-0 1.5708 0"/>
+    <parent link="connector2"/>
+    <child link="connector3"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-0.8" upper="1.54"/>
+  </joint>
+  <!-- Joint from connector0 to connector2 -->
+  <joint name="hip_left_x" type="revolute">
+    <origin xyz="0.01525 -0.012 -0.059" rpy="-1.5708 1.85037e-16 1.5708"/>
+    <parent link="connector0"/>
+    <child link="connector2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.54" upper="0.3"/>
+  </joint>
+  <!-- Joint from hip to connector0 -->
+  <joint name="hip_left_y" type="revolute">
+    <origin xyz="-0.0750228 0.072 -0.0230023" rpy="1.5708 -0 0"/>
+    <parent link="hip"/>
+    <child link="connector0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.54" upper="1.54"/>
+  </joint>
+  <!-- Link connector0_2 -->
+  <link name="connector0_2">
+    <inertial>
+      <origin xyz="0.000419786 -0.00977757 -0.0525704" rpy="0 0 0"/>
+      <mass value="0.759712"/>
+      <inertia ixx="0.00106697" ixy="1.44779e-06" ixz="3.36933e-06" iyy="0.000715971" iyz="-6.45966e-05" izz="0.000580725"/>
+    </inertial>
+    <!-- Part connector0_2 -->
+    <visual>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_7 -->
+    <visual>
+      <origin xyz="-0.01475 -0.012 -0.059" rpy="-1.5708 1.85037e-16 1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.01475 -0.012 -0.059" rpy="-1.5708 1.85037e-16 1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector1_2 -->
+    <visual>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector2_3 -->
+  <link name="connector2_3">
+    <inertial>
+      <origin xyz="-0.070879 -3.98452e-10 0.016405" rpy="0 0 0"/>
+      <mass value="0.768711"/>
+      <inertia ixx="0.000834738" ixy="-8.46017e-12" ixz="3.24212e-05" iyy="0.00100733" iyz="1.82259e-13" izz="0.000953625"/>
+    </inertial>
+    <!-- Part connector4_2 -->
+    <visual>
+      <origin xyz="-0.034 0 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector4.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.034 0 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector4.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_8 -->
+    <visual>
+      <origin xyz="-0.098 -2.77556e-17 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.098 -2.77556e-17 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector2_3 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector3_2 -->
+  <link name="connector3_2">
+    <inertial>
+      <origin xyz="-5.84414e-05 0.0017471 -0.112644" rpy="0 0 0"/>
+      <mass value="0.935207"/>
+      <inertia ixx="0.00276025" ixy="2.05674e-08" ixz="-1.05697e-06" iyy="0.00308647" iyz="5.12972e-05" izz="0.000569835"/>
+    </inertial>
+    <!-- Part connector6_2 -->
+    <visual>
+      <origin xyz="-7.10983e-05 -0.0125 -0.144" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector6.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-7.10983e-05 -0.0125 -0.144" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector6.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector3_2 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector3.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector3.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_9 -->
+    <visual>
+      <origin xyz="-7.10983e-05 -0.0125 -0.144" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-7.10983e-05 -0.0125 -0.144" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part thigh_bone_2 -->
+    <visual>
+      <origin xyz="0.000307787 0 -0.082" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/thigh_bone.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.000307787 0 -0.082" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/thigh_bone.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector2_4 -->
+  <link name="connector2_4">
+    <inertial>
+      <origin xyz="-7.67692e-05 0.155915 0.016796" rpy="0 0 0"/>
+      <mass value="0.650858"/>
+      <inertia ixx="0.00622527" ixy="4.76015e-06" ixz="7.28217e-08" iyy="0.000251593" iyz="-0.000111591" izz="0.00612623"/>
+    </inertial>
+    <!-- Part shin_bone_2 -->
+    <visual>
+      <origin xyz="0.000202982 0.245 0.017" rpy="1.5708 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/shin_bone.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.000202982 0.245 0.017" rpy="1.5708 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/shin_bone.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector2_4 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part small_motor_2 -->
+    <visual>
+      <origin xyz="-0.000192408 0.28 0.00500002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.000192408 0.28 0.00500002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector5_2 -->
+    <visual>
+      <origin xyz="-0.000192408 0.28 0.00500002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.000192408 0.28 0.00500002" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link shoes_2 -->
+  <link name="shoes_2">
+    <inertial>
+      <origin xyz="0.0407995 0.0301209 0.0169957" rpy="0 0 0"/>
+      <mass value="0.336504"/>
+      <inertia ixx="0.000183453" ixy="-1.91792e-05" ixz="7.71443e-08" iyy="0.000613076" iyz="6.74133e-09" izz="0.000571959"/>
+    </inertial>
+    <!-- Part shoes_2 -->
+    <visual>
+      <origin xyz="0.00582733 -0.0081512 0.047" rpy="0 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/shoes.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.00582733 -0.0081512 0.047" rpy="0 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/shoes.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from connector2_4 to shoes_2 -->
+  <joint name="right_ankle" type="revolute">
+    <origin xyz="-0.000192408 0.28 1.62227e-08" rpy="0 -0 0"/>
+    <parent link="connector2_4"/>
+    <child link="shoes_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-0.6" upper="0.7"/>
+  </joint>
+  <!-- Joint from connector3_2 to connector2_4 -->
+  <joint name="knee_right" type="revolute">
+    <origin xyz="-7.10983e-05 -0.0145 -0.144" rpy="-1.5708 -0 0"/>
+    <parent link="connector3_2"/>
+    <child link="connector2_4"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-0.1" upper="1.85"/>
+  </joint>
+  <!-- Joint from connector2_3 to connector3_2 -->
+  <joint name="hip_right_z" type="revolute">
+    <origin xyz="-0.1 -2.77556e-17 0.017" rpy="-0 1.5708 0"/>
+    <parent link="connector2_3"/>
+    <child link="connector3_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.54" upper="0.8"/>
+  </joint>
+  <!-- Joint from connector0_2 to connector2_3 -->
+  <joint name="hip_right_x" type="revolute">
+    <origin xyz="-0.01675 -0.012 -0.059" rpy="1.5708 1.85037e-16 1.5708"/>
+    <parent link="connector0_2"/>
+    <child link="connector2_3"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-.3" upper="1.54"/>
+  </joint>
+  <!-- Joint from hip to connector0_2 -->
+  <joint name="hip_right_y" type="revolute">
+    <origin xyz="-0.0750228 -0.072 -0.0230023" rpy="1.5708 -0 3.14159"/>
+    <parent link="hip"/>
+    <child link="connector0_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.54" upper="1.54"/>
+  </joint>
+  <!-- Link connector0_3 -->
+  <link name="connector0_3">
+    <inertial>
+      <origin xyz="-0.00177518 -3.44733e-08 -0.168206" rpy="0 0 0"/>
+      <mass value="6.2149"/>
+      <inertia ixx="0.0721998" ixy="-0.000183484" ixz="0.0010436" iyy="0.0494782" iyz="-3.45362e-07" izz="0.0418963"/>
+    </inertial>
+    <!-- Part big_motor_10 -->
+    <visual>
+      <origin xyz="0.000528207 0.125 -0.232" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.000528207 0.125 -0.232" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part chest -->
+    <visual>
+      <origin xyz="0.0770282 -5.72583e-17 -0.1545" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/chest.stl"/>
+      </geometry>
+      <material name="body_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0770282 -5.72583e-17 -0.1545" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/chest.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector0_3 -->
+    <visual>
+      <origin xyz="0 1.83697e-18 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+      <material name="connector0_3_material">
+        <color rgba="0.231373 0.380392 0.705882 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 1.83697e-18 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_11 -->
+    <visual>
+      <origin xyz="-0.00297179 -0.125 -0.232006" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.00297179 -0.125 -0.232006" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector0_4 -->
+  <link name="connector0_4">
+    <inertial>
+      <origin xyz="-0.00178585 -0.00977757 -0.0525704" rpy="0 0 0"/>
+      <mass value="0.759712"/>
+      <inertia ixx="0.00106697" ixy="-2.27622e-06" ixz="-7.40439e-06" iyy="0.000716195" iyz="-6.45966e-05" izz="0.00058095"/>
+    </inertial>
+    <!-- Part connector0_4 -->
+    <visual>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part big_motor_12 -->
+    <visual>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="1.5708 1.85037e-16 1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="1.5708 1.85037e-16 1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector1_3 -->
+    <visual>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0.01325 -0.012 -0.059" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector2_5 -->
+  <link name="connector2_5">
+    <inertial>
+      <origin xyz="-0.0522817 1.59545e-17 0.0154115" rpy="0 0 0"/>
+      <mass value="0.287959"/>
+      <inertia ixx="0.000155592" ixy="1.03301e-19" ixz="2.39145e-05" iyy="0.000451192" iyz="-6.57067e-21" izz="0.0003979"/>
+    </inertial>
+    <!-- Part connector2_5 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector7 -->
+    <visual>
+      <origin xyz="-0.069 2.77556e-17 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.069 2.77556e-17 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part small_motor_3 -->
+    <visual>
+      <origin xyz="-0.093 2.77556e-17 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.093 2.77556e-17 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector7 -->
+  <link name="connector7">
+    <inertial>
+      <origin xyz="-8.7963e-19 -0.00169196 -0.0384885" rpy="0 0 0"/>
+      <mass value="0.191842"/>
+      <inertia ixx="7.90601e-05" ixy="-1.66786e-22" ixz="-9.61509e-22" iyy="9.39121e-05" iyz="-1.78899e-06" izz="5.41431e-05"/>
+    </inertial>
+    <!-- Part connector7_2 -->
+    <visual>
+      <origin xyz="0 0 -0.009" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.009" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector5_3 -->
+    <visual>
+      <origin xyz="0 -0.012 -0.044" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.012 -0.044" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part small_motor_4 -->
+    <visual>
+      <origin xyz="0 0.012 -0.044" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0.012 -0.044" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector8 -->
+  <link name="connector8">
+    <inertial>
+      <origin xyz="1.5585e-08 -0.0682241 0.0126168" rpy="0 0 0"/>
+      <mass value="0.112857"/>
+      <inertia ixx="0.000209433" ixy="-8.28255e-11" ixz="-6.19243e-08" iyy="1.9316e-05" iyz="6.79986e-06" izz="0.00019964"/>
+    </inertial>
+    <!-- Part wrist -->
+    <visual>
+      <origin xyz="0 -0.032 0.0135" rpy="1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/wrist.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.032 0.0135" rpy="1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/wrist.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector8 -->
+    <visual>
+      <origin xyz="0 0 0.001" rpy="3.14159 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/connector8.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.001" rpy="3.14159 -0 3.14159"/>
+      <geometry>
+        <mesh filename="assets/connector8.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part hand_placeholder -->
+    <visual>
+      <origin xyz="0 -0.13121 0.0135" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/hand_placeholder.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.13121 0.0135" rpy="-1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/hand_placeholder.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from connector7 to connector8 -->
+  <joint name="left_elbow" type="revolute">
+    <origin xyz="0 0.013 -0.044" rpy="1.5708 -0 0"/>
+    <parent link="connector7"/>
+    <child link="connector8"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-.1" upper="1.54"/>
+  </joint>
+  <!-- Joint from connector2_5 to connector7 -->
+  <joint name="left_shoulder_z" type="revolute">
+    <origin xyz="-0.093 2.77556e-17 0.017" rpy="-0 1.5708 0"/>
+    <parent link="connector2_5"/>
+    <child link="connector7"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.54" upper="1.54"/>
+  </joint>
+  <!-- Joint from connector0_4 to connector2_5 -->
+  <joint name="left_shoulder_x" type="revolute">
+    <origin xyz="0.01525 -0.012 -0.059" rpy="-1.5708 0.0 1.5708"/>
+    <parent link="connector0_4"/>
+    <child link="connector2_5"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.80" upper="0.45"/>
+  </joint>
+  <!-- Joint from connector0_3 to connector0_4 -->
+  <joint name="left_shoulder_y" type="revolute">
+    <origin xyz="-0.00297179 -0.127 -0.232006" rpy="-1.5708 -0 0"/>
+    <parent link="connector0_3"/>
+    <child link="connector0_4"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Link connector0_5 -->
+  <link name="connector0_5">
+    <inertial>
+      <origin xyz="-0.000419786 0.00977757 -0.0525704" rpy="0 0 0"/>
+      <mass value="0.759712"/>
+      <inertia ixx="0.00106697" ixy="1.44779e-06" ixz="-3.36933e-06" iyy="0.000715971" iyz="6.45966e-05" izz="0.000580725"/>
+    </inertial>
+    <!-- Part big_motor_13 -->
+    <visual>
+      <origin xyz="0.01475 0.012 -0.059" rpy="-1.5708 1.85037e-16 -1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+      <material name="big_motor_13_material">
+        <color rgba="0.866667 0.321569 0.156863 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.01475 0.012 -0.059" rpy="-1.5708 1.85037e-16 -1.5708"/>
+      <geometry>
+        <mesh filename="assets/big_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector0_5 -->
+    <visual>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector0.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector1_4 -->
+    <visual>
+      <origin xyz="-0.01325 0.012 -0.059" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.01325 0.012 -0.059" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector1.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector2_6 -->
+  <link name="connector2_6">
+    <inertial>
+      <origin xyz="-0.0522817 1.59545e-17 0.0154115" rpy="0 0 0"/>
+      <mass value="0.287959"/>
+      <inertia ixx="0.000155592" ixy="1.03301e-19" ixz="2.39145e-05" iyy="0.000451192" iyz="-6.57067e-21" izz="0.0003979"/>
+    </inertial>
+    <!-- Part connector2_6 -->
+    <visual>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.002" rpy="3.14159 -0 1.5708"/>
+      <geometry>
+        <mesh filename="assets/connector2.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part small_motor_5 -->
+    <visual>
+      <origin xyz="-0.093 2.77556e-17 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.093 2.77556e-17 0.017" rpy="-3.14159 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector7_3 -->
+    <visual>
+      <origin xyz="-0.069 2.77556e-17 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.069 2.77556e-17 0.017" rpy="-0 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector7_2 -->
+  <link name="connector7_2">
+    <inertial>
+      <origin xyz="-8.7963e-19 0.00169196 -0.0384885" rpy="0 0 0"/>
+      <mass value="0.191842"/>
+      <inertia ixx="7.90601e-05" ixy="1.66786e-22" ixz="-9.61509e-22" iyy="9.39121e-05" iyz="1.78899e-06" izz="5.41431e-05"/>
+    </inertial>
+    <!-- Part small_motor_6 -->
+    <visual>
+      <origin xyz="0 -0.012 -0.044" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+      <material name="motor_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.012 -0.044" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/small_motor.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector5_4 -->
+    <visual>
+      <origin xyz="0 -0.012 -0.044" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 -0.012 -0.044" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector5.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector7_4 -->
+    <visual>
+      <origin xyz="0 0 -0.009" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.009" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector7.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link connector8_2 -->
+  <link name="connector8_2">
+    <inertial>
+      <origin xyz="-1.5585e-08 0.0682241 0.0126168" rpy="0 0 0"/>
+      <mass value="0.112857"/>
+      <inertia ixx="0.000209433" ixy="-8.28255e-11" ixz="6.19243e-08" iyy="1.9316e-05" iyz="-6.79986e-06" izz="0.00019964"/>
+    </inertial>
+    <!-- Part hand_placeholder_2 -->
+    <visual>
+      <origin xyz="0 0.13121 0.0135" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/hand_placeholder.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0.13121 0.0135" rpy="1.5708 -0 0"/>
+      <geometry>
+        <mesh filename="assets/hand_placeholder.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part wrist_2 -->
+    <visual>
+      <origin xyz="0 0.032 0.0135" rpy="-1.5708 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/wrist.stl"/>
+      </geometry>
+      <material name="limb_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0.032 0.0135" rpy="-1.5708 1.5708 0"/>
+      <geometry>
+        <mesh filename="assets/wrist.stl"/>
+      </geometry>
+    </collision>
+    <!-- Part connector8_2 -->
+    <visual>
+      <origin xyz="0 0 0.001" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector8.stl"/>
+      </geometry>
+      <material name="connector_mat"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.001" rpy="3.14159 -0 0"/>
+      <geometry>
+        <mesh filename="assets/connector8.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from connector7_2 to connector8_2 -->
+  <joint name="right_elbow" type="revolute">
+    <origin xyz="0 -0.013 -0.044" rpy="-1.5708 -0 0"/>
+    <parent link="connector7_2"/>
+    <child link="connector8_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.54" upper="0.1"/>
+  </joint>
+  <!-- Joint from connector2_6 to connector7_2 -->
+  <joint name="right_shoulder_z" type="revolute">
+    <origin xyz="-0.093 2.77556e-17 0.017" rpy="-0 1.5708 0"/>
+    <parent link="connector2_6"/>
+    <child link="connector7_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.54" upper="1.54"/>
+  </joint>
+  <!-- Joint from connector0_5 to connector2_6 -->
+  <joint name="right_shoulder_x" type="revolute">
+    <origin xyz="0.01675 0.012 -0.059" rpy="1.5708 0.0 -1.5708"/>
+    <parent link="connector0_5"/>
+    <child link="connector2_6"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-0.45" upper="1.8"/>
+  </joint>
+  <!-- Joint from connector0_3 to connector0_5 -->
+  <joint name="right_shoulder_y" type="revolute">
+    <origin xyz="0.000528207 0.127 -0.232" rpy="1.5708 -0 0"/>
+    <parent link="connector0_3"/>
+    <child link="connector0_5"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Joint from hip to connector0_3 -->
+  <joint name="spine" type="revolute">
+    <origin xyz="-0.0707505 6.12323e-19 0.077" rpy="3.14159 -0 0"/>
+    <parent link="hip"/>
+    <child link="connector0_3"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-1.0" upper="1.0"/>
+  </joint>
+
+  <!--Dummy tip link for IK calculations-->
+  <link name="left_wrist"/>
+  <!-- Fixed joint attaching the dummy to the foot -->
+  <joint name="left_wrist_joint" type="fixed">
+    <parent link="connector8"/>
+    <child link="left_wrist"/>
+    <origin xyz="0.0 -.131 0.01" rpy="0 0 0"/>
+  </joint>
+
+  <!--Dummy tip link for IK calculations-->
+  <link name="right_wrist"/>
+  <!-- Fixed joint attaching the dummy to the foot -->
+  <joint name="right_wrist_joint" type="fixed">
+    <parent link="connector8_2"/>
+    <child link="right_wrist"/>
+    <origin xyz="0.0 .131 0.01" rpy="0 0 0"/>
+  </joint>
+
+</robot>
