@@ -5,9 +5,21 @@ from functools import partial
 import time
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
+import argparse
+
+parser = argparse.ArgumentParser(description="IK solver demo")
+
+# Positional (Required)
+parser.add_argument('mocap_data', type=str, help='Path to mocap data.')
+
+# Optional Flags
+parser.add_argument('--start_frame', type=int, default=0, help='Start frame (default: 0).')
+parser.add_argument('--end_frame', type=int, default=-1, help='End frame.')
+parser.add_argument('--urdf_path', type=str, default='../robot_model/robot.urdf')
+args = parser.parse_args()
 
 
-urdf_path = '../robot_model/robot.urdf'
+urdf_path = args.urdf_path
 urdf_model = URDF.load(urdf_path)
 
 #keys: robot joint names. values: mocap data entry names
@@ -94,7 +106,7 @@ robot_pose_correction = {
     'spine': 0.0
 }
 
-with open("mocap_data.pkl", "rb") as f:
+with open(args.mocap_data, "rb") as f:
     mocap = pickle.load(f)
 
 print(mocap.keys())
@@ -104,7 +116,7 @@ def get_joint_angles_for_all_frames(joint_name, mocap):
     """
     Returns an array of shape [num_frames] for this joint
     """
-    mocap_quat = np.array(mocap[joint_to_mocap_dataname[joint_name]])  # shape [num_frames, 3]
+    mocap_quat = np.array(mocap[joint_to_mocap_dataname[joint_name]])[args.start_frame:args.end_frame]  # shape [num_frames, 3]
     mocap_angles_xyz = Rotation.from_quat(mocap_quat).as_euler(angles_decomposion_order[joint_name], degrees=False)
 
     axis_map = joint_axis_to_mocap_data_axis[joint_name]
