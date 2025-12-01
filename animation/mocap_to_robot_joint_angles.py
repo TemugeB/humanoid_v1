@@ -110,6 +110,7 @@ with open(args.mocap_data, "rb") as f:
     mocap = pickle.load(f)
 
 print(mocap.keys())
+print(f'Number of mocap frames: {len(mocap[list(mocap.keys())[0]])}')
 
 # Mocap: quaternion
 def get_joint_angles_for_all_frames(joint_name, mocap):
