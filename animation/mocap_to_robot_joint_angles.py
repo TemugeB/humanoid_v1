@@ -163,3 +163,11 @@ def anim_callback(scene, urdf_model, trajectory, anim_config):
 urdf_model.show(
         callback=partial(anim_callback, urdf_model=urdf_model, trajectory = robot_angles, anim_config=anim_config)
 )
+
+cropped_mocap = {
+    key: arr[args.start_frame:args.end_frame] 
+    for key, arr in mocap.items()
+} 
+
+with open("mocap_cropped.pkl", "wb") as f:
+    pickle.dump(cropped_mocap, f)
