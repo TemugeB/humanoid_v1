@@ -108,6 +108,28 @@ def motion_phase_observation(env: ManagerBasedEnv,
     phase = (frame_idx % num_frames) / num_frames
     return phase.unsqueeze(-1)
 
+def motion_phase_observation_cyclic(env: ManagerBasedEnv,
+                                    animation_fps: float,
+                                    num_frames: int):
+    
+    #current time of each environment
+    sim_time = mdp.current_time_s(env).squeeze(-1)
+
+    #calculate the period in [s]
+    period = num_frames/animation_fps
+
+    #motion obs
+    x = torch.cos( sim_time * 2 * torch.pi / period) # this should keep the device of sim_time
+    y = torch.sin( sim_time * 2 * torch.pi / period)
+
+    return torch.stack([x, y], axis = -1)
+
+
+    # warp to trajectory length
+    phase = (frame_idx % num_frames) / num_frames
+    return phase.unsqueeze(-1)
+
+
 class joint_acceleration(ManagerTermBase):
 
     def __call__(self, 

@@ -144,6 +144,9 @@ def get_all_robot_joint_angles_all_frames(mocap):
     return robot_angles
 
 robot_angles = get_all_robot_joint_angles_all_frames(mocap)
+# for key in robot_angles.keys():
+#     plt.plot(robot_angles[key], label = key)
+
 # plt.plot(robot_angles['hip_left_x'], label = 'x')
 # plt.plot(robot_angles['hip_left_y'], label = 'y')
 # plt.plot(robot_angles['hip_left_z'], label = 'z')
@@ -169,5 +172,6 @@ cropped_mocap = {
     for key, arr in mocap.items()
 } 
 
-with open("mocap_cropped.pkl", "wb") as f:
-    pickle.dump(cropped_mocap, f)
+print('Generated robot angles for: ', robot_angles.keys())
+# with open("robot_angles.pkl", "wb") as f:
+#     pickle.dump(robot_angles, f)

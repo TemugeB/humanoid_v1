@@ -25,8 +25,9 @@ joints = [
     'right_shoulder_y', 'right_shoulder_x', 'right_shoulder_z', 'right_elbow'    
 ]
 
-usd_path = "/home/temuge/my_bots/humanoid_urdf/robot/humanoid.usd"
-#usd_path = "/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd"
+usd_path = "/home/temuge/isaac_projects/humanoid_v1/robot_model/robot/humanoid.usd"
+animation_fps = 24
+num_frames = 45
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -179,19 +180,17 @@ class ObservationsCfg:
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        #base_height = ObsTerm(func=mdp.base_pos_z)
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
         base_orientation = ObsTerm(func=mdp.base_yaw_pitch_roll)
-        #base_angle_to_target = ObsTerm(func=mdp.base_angle_to_target, params={"target_pos": (1000.0, 0.0, 0.0)})
         base_up_proj = ObsTerm(func=mdp.base_up_proj)
-        #base_heading_proj = ObsTerm(func=mdp.base_heading_proj, params={"target_pos": (1000.0, 0.0, 0.0)})
         joint_pos_norm = ObsTerm(func=mdp.joint_pos_rel)
         joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel, scale=0.2)
-        #joint_acc_rel = ObsTerm(func=mdp.joint_acceleration, scale = 0.1)
         actions = ObsTerm(func=mdp.last_action)
+        base_angle_to_target = ObsTerm(func=mdp.base_angle_to_target, params={"target_pos": (1000.0, 0.0, 0.0)})
+        base_heading_proj = ObsTerm(func=mdp.base_heading_proj, params={"target_pos": (1000.0, 0.0, 0.0)})
         feet_contacts = ObsTerm(func=mdp.feet_contact, params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"])})
-        #motion_phase = ObsTerm(func=mdp.motion_phase_observation, params={'animation_fps': animation_fps, 'num_frames': num_frames})
+        motion_phase = ObsTerm(func=mdp.motion_phase_observation_cyclic, params={'animation_fps': animation_fps, 'num_frames': num_frames})
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -272,22 +271,19 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    #alive = RewTerm(func=mdp.is_alive, weight=10.0)
-    #torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-3)
-    #joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-6)
-    #action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.5)
-    #default_pose = RewTerm(func=mdp.default_pose_tracking, weight = -0.5, params={'threshold': 0.0})
-    compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 5e-2})
+    progress = RewTerm(func=mdp.progress_reward, weight=0.5, params={"target_pos": (1000.0, 0.0, 0.0)})
+    alive = RewTerm(func=mdp.is_alive, weight=10.0)
+    torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-3)
+    joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-6)
+    action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.5)
+    animation_tracking = RewTerm(func=mdp.joint_angle_tracking, weight = -2.0, params = {'animation_fps': animation_fps})
+    move_to_target = RewTerm(func=mdp.move_to_target_bonus, weight=0.5, params={"threshold": 0.8, "target_pos": (1000.0, 0.0, 0.0)})
+    #compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 5e-2})
     
-    feet_slide = RewTerm(func=mdp.feet_slide, weight = -0.1, params={
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
-            "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
+    # feet_slide = RewTerm(func=mdp.feet_slide, weight = -0.1, params={
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
     
-    #ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
-    #action_l2 = RewTerm(func=mdp.action_l2, weight = -0.5)
-    #action_accel_l2 = RewTerm(func=mdp.action_acc_l2, weight=-0.45)
-    #root_motion_l2 = RewTerm(func=mdp.root_motion_l2, weight = -3.0)
-    #root_rotation_l2 = RewTerm(func=mdp.root_rotation_l2, weight = -0.001)
 
 @configclass
 class TerminationsCfg:

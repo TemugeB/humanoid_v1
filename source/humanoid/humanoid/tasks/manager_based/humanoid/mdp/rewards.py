@@ -153,8 +153,7 @@ class joint_angle_tracking(ManagerTermBase):
     def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
 
         # open the trajectory data and convert to torch tensor
-        traj_path = '/home/temuge/robots/animations/joint_trajectory.pkl'
-        traj_path = '/home/temuge/my_bots/joint_trajectory.pkl'
+        traj_path = '/home/temuge/isaac_projects/humanoid_v1/animation/robot_angles.pkl'
         with open(traj_path, "rb") as f:
             joint_traj = pickle.load(f)
         self.joint_traj = {k: torch.tensor(v, device=env.device) for k,v in joint_traj.items()}
