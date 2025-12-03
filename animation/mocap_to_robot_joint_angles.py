@@ -171,10 +171,12 @@ urdf_model.show(
         callback=partial(anim_callback, urdf_model=urdf_model, trajectory = robot_angles, anim_config=anim_config)
 )
 
-cropped_mocap = {
-    key: arr[args.start_frame:args.end_frame] 
-    for key, arr in mocap.items()
-} 
+#crop the mocap data. The robot angles are already cropped.
+if args.end_frame:
+    cropped_mocap = {key: arr[args.start_frame:args.end_frame] for key, arr in mocap.items()}
+else:
+    cropped_mocap = {key: arr[args.start_frame:] for key, arr in mocap.items()} 
+
 
 print('Generated robot angles for: ', robot_angles.keys())
 with open("robot_angles_walk.pkl", "wb") as f:
