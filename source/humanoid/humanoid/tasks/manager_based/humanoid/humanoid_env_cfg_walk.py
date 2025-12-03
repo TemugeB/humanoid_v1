@@ -27,8 +27,8 @@ joints = [
 
 usd_path = "/home/temuge/isaac_projects/humanoid_v1/robot_model/robot/humanoid.usd"
 usd_path = '/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd'
-animation_fps = 24
-num_frames = 45
+animation_fps = 90
+num_frames = 135
 
 HUMANOID_CONFIG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -277,8 +277,8 @@ class RewardsCfg:
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-1e-3)
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-6)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-1.5)
-    animation_tracking = RewTerm(func=mdp.joint_angle_tracking, weight = -2.0, params = {'animation_fps': animation_fps})
-    move_to_target = RewTerm(func=mdp.move_to_target_bonus, weight=0.5, params={"threshold": 0.8, "target_pos": (1000.0, 0.0, 0.0)})
+    animation_tracking = RewTerm(func=mdp.joint_angle_tracking, weight = -1.0, params = {'animation_fps': animation_fps})
+    move_to_target = RewTerm(func=mdp.move_to_target_bonus, weight=1.0, params={"threshold": 0.8, "target_pos": (1000.0, 0.0, 0.0)})
     #compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 5e-2})
     
     # feet_slide = RewTerm(func=mdp.feet_slide, weight = -0.1, params={

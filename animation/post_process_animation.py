@@ -130,7 +130,6 @@ def anim_callback(scene, urdf_model, trajectory, anim_config):
 urdf_model.show(
 #        callback=partial(anim_callback, urdf_model=urdf_model, trajectory = joint_rotations, anim_config=anim_config)
         callback=partial(anim_callback, urdf_model=urdf_model, trajectory = blended_anim, anim_config=anim_config)
-
 )
 
 print(len(blended_rotations[list(blended_rotations.keys())[0]]))
