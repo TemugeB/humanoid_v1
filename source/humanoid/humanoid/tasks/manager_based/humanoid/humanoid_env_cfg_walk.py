@@ -26,7 +26,7 @@ joints = [
 ]
 
 usd_path = "/home/temuge/isaac_projects/humanoid_v1/robot_model/robot/humanoid.usd"
-animation_fps = 24
+animation_fps = 30
 num_frames = 45
 
 HUMANOID_CONFIG = ArticulationCfg(
