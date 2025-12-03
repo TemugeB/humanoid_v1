@@ -569,4 +569,58 @@ class compound_reward(ManagerTermBase):
              print(f"Total Steps: {total_steps}. Curriculum Alpha: {alpha.item():.4f}. Alive Weight: {self.term_decay['alive'][0].item():.4f}")
 
         return
+
+
+class feet_contact_tracking(ManagerTermBase):
+    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
+
+        num_frames = 135
+        #get the indices masks for contact penalty
+        left_no_contact_frames = list(range(50, 90))
+        self.left_nocontact_mask = torch.zeros((num_frames), dtype=torch.int32, device = env.device)
+        self.left_nocontact_mask[left_no_contact_frames] = 1
+
+        right_no_contact_frames = list(range(33)) + list(range(114, 135))
+        self.right_nocontact_mask = torch.zeros((num_frames), dtype=torch.int32, device = env.device)
+        self.right_nocontact_mask[right_no_contact_frames] = 1
+
+        contact_sensor = env.scene.sensors['contact_forces']
+        self.left_feet_id = contact_sensor.find_bodies(['shoes'])[0]
+        self.right_feet_id = contact_sensor.find_bodies(['shoes_2'])[0]
+
+    def __call__(self, 
+                 env: ManagerBasedRLEnv,
+                 animation_fps: float,
+                 num_frames: int,
+                 ) -> torch.Tensor:
+    
+        contact_sensor: ContactSensor = env.scene.sensors['contact_forces']
+        
+        #get the contact state of the left feet. Has shape [num_envs, 1]
+        left_contacts = contact_sensor.data.net_forces_w_history[:, :, self.left_feet_id, :].norm(dim=-1).max(dim=1)[0] > 1.0
+        right_contacts = contact_sensor.data.net_forces_w_history[:, :, self.right_feet_id, :].norm(dim=-1).max(dim=1)[0] > 1.0
+
+        #get the current frame index of each environment
+        sampling_times = mdp.current_time_s(env).squeeze(-1)
+
+        # fractional index
+        frame_idx = sampling_times * animation_fps
+
+        # wrap animation
+        frame_idx = frame_idx % num_frames
+
+        # find the closes frame index
+        frame_idx = torch.round(frame_idx).to(torch.int32)
+
+        # if current frame prohibits contact. [num_envs, 1]
+        left_contact_prohibited = self.left_nocontact_mask[frame_idx].reshape(-1, 1)
+        right_contact_prohibited = self.right_nocontact_mask[frame_idx].reshape(-1, 1)
+
+        # currently in illegal contact?
+        left_illegal_foot_contact = left_contacts * left_contact_prohibited
+        right_illegal_foot_contact = right_contacts * right_contact_prohibited
+
+        # penalty term
+        foot_contact_tracking_penalty = left_illegal_foot_contact + right_illegal_foot_contact
+        return foot_contact_tracking_penalty.squeeze()
     
