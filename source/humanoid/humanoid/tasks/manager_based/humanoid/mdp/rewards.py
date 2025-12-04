@@ -610,7 +610,7 @@ class feet_contact_tracking(ManagerTermBase):
         frame_idx = frame_idx % num_frames
 
         # find the closes frame index
-        frame_idx = torch.round(frame_idx).to(torch.int32)
+        frame_idx = torch.floor(frame_idx).to(torch.int32)
 
         # if current frame prohibits contact. [num_envs, 1]
         left_contact_prohibited = self.left_nocontact_mask[frame_idx].reshape(-1, 1)
@@ -623,4 +623,11 @@ class feet_contact_tracking(ManagerTermBase):
         # penalty term
         foot_contact_tracking_penalty = left_illegal_foot_contact + right_illegal_foot_contact
         return foot_contact_tracking_penalty.squeeze()
-    
+
+def clipped_base_forward_motion(env, threshold: float):
+
+    #get the current forward motion of all envs
+    lin_vel = mdp.base_lin_vel(env)
+    print(lin_vel)
+
+    return torch.zeros((env.num_envs), device=env.device)
