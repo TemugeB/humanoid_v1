@@ -100,6 +100,16 @@ def blend_for_looping(joint_rotations):
 
     return blended_rotations
 
+def calculate_joint_velocity(joint_rotations):
+
+    joint_velocities = {}
+    for joint_name, traj in joint_rotations.items():
+        _t = np.append(traj, traj[0])
+        vel = _t[1:] - _t[:-1]
+        joint_velocities[joint_name] = vel
+    return joint_velocities
+
+
 #apply exp smoothing
 smoothed_rotations = apply_smoothing(joint_rotations, alpha=0.9)
 
@@ -135,3 +145,13 @@ urdf_model.show(
 print(len(blended_rotations[list(blended_rotations.keys())[0]]))
 with open("postprocessed_joint_angles.pkl", "wb") as f:
     pickle.dump(blended_rotations, f)
+
+blended_velocities = calculate_joint_velocity(blended_rotations)
+with open("postprocessed_joint_velocities.pkl", "wb") as f:
+    pickle.dump(blended_velocities, f)
+
+joint_ = 'hip_left_y'
+plt.plot(blended_velocities[joint_][::3], label = 'joint_velocity')
+
+plt.legend()
+plt.show()

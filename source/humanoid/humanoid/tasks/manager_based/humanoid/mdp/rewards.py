@@ -153,11 +153,33 @@ class joint_angle_tracking(ManagerTermBase):
     def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
 
         # open the trajectory data and convert to torch tensor
-        traj_path = '/home/temuge/isaac_projects/humanoid_v1/animation/robot_angles.pkl'
+        #traj_path = '/home/temuge/isaac_projects/humanoid_v1/animation/robot_angles.pkl'
         traj_path = '/home/temuge/isaac_projects/humanoid_v1/animation/postprocessed_joint_angles.pkl'
         with open(traj_path, "rb") as f:
             joint_traj = pickle.load(f)
         self.joint_traj = {k: torch.tensor(v, device=env.device) for k,v in joint_traj.items()}
+
+        self.tracking_weight = {
+            'hip_left_x'        : 1.0, 
+            'hip_left_z'        : 1.0,
+            'hip_left_y'        : 1.0,
+            'knee_left'         : 0.25,
+            'left_ankle'        : 1.0,
+            'hip_right_x'       : 1.0, 
+            'hip_right_z'       : 1.0,
+            'hip_right_y'       : 1.0,
+            'knee_right'        : 0.25,
+            'right_ankle'       : 1.0,
+            'spine'             : 1.0,
+            'left_shoulder_y'   : 1.0, 
+            'left_shoulder_x'   : 1.0, 
+            'left_shoulder_z'   : 1.0,
+            'right_shoulder_y'  : 1.0, 
+            'right_shoulder_x'  : 1.0, 
+            'right_shoulder_z'  : 1.0,
+            'left_elbow'        : 1.0,
+            'right_elbow'       : 1.0
+        }
 
     def __call__(self, 
                  env: ManagerBasedRLEnv, 
@@ -198,7 +220,7 @@ class joint_angle_tracking(ManagerTermBase):
             # calculate penalty for diverging from the expected joint trajectory
             def_pose = torch.zeros_like(current_pos)
             reward = torch.square(current_pos - joint_targets)
-            rewards.append(reward)
+            rewards.append(self.tracking_weight[joint_name] * reward)
         
         #interestingly, the reward term seems to be shape (num_envs, ), not (num_envs, 1)
         total_reward = torch.stack(rewards, dim = -1).sum(-1)
@@ -576,11 +598,11 @@ class feet_contact_tracking(ManagerTermBase):
 
         num_frames = 135
         #get the indices masks for contact penalty
-        left_no_contact_frames = list(range(50, 90))
+        left_no_contact_frames = list(range(54, 86))
         self.left_nocontact_mask = torch.zeros((num_frames), dtype=torch.int32, device = env.device)
         self.left_nocontact_mask[left_no_contact_frames] = 1
 
-        right_no_contact_frames = list(range(33)) + list(range(114, 135))
+        right_no_contact_frames = list(range(20)) + list(range(120, 135))
         self.right_nocontact_mask = torch.zeros((num_frames), dtype=torch.int32, device = env.device)
         self.right_nocontact_mask[right_no_contact_frames] = 1
 
@@ -631,3 +653,80 @@ def clipped_base_forward_motion(env, threshold: float):
     print(lin_vel)
 
     return torch.zeros((env.num_envs), device=env.device)
+
+class joint_velocity_tracking(ManagerTermBase):
+
+    def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
+
+        # open the trajectory data and convert to torch tensor
+        traj_path = '/home/temuge/isaac_projects/humanoid_v1/animation/postprocessed_joint_velocities.pkl'
+        with open(traj_path, "rb") as f:
+            joint_traj = pickle.load(f)
+        self.joint_velocities = {k: torch.tensor(v, device=env.device) for k,v in joint_traj.items()}
+
+        self.tracking_weight = {
+            'hip_left_x'        : 1.0, 
+            'hip_left_z'        : 1.0,
+            'hip_left_y'        : 1.0,
+            'knee_left'         : 0.25,
+            'left_ankle'        : 1.0,
+            'hip_right_x'       : 1.0, 
+            'hip_right_z'       : 1.0,
+            'hip_right_y'       : 1.0,
+            'knee_right'        : 0.25,
+            'right_ankle'       : 1.0,
+            'spine'             : 1.0,
+            'left_shoulder_y'   : 1.0, 
+            'left_shoulder_x'   : 1.0, 
+            'left_shoulder_z'   : 1.0,
+            'right_shoulder_y'  : 1.0, 
+            'right_shoulder_x'  : 1.0, 
+            'right_shoulder_z'  : 1.0,
+            'left_elbow'        : 1.0,
+            'right_elbow'       : 1.0
+        }
+
+    def __call__(self, 
+                 env: ManagerBasedRLEnv, 
+                 animation_fps: float, 
+                 asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+        
+        asset : Articulation = env.scene[asset_cfg.name]
+
+        #Get the current time of each environment
+        sampling_times = mdp.current_time_s(env).squeeze(-1)
+
+        #For each limb, calculate the reward.
+        # TODO: vectorize
+        rewards = []
+        for joint_name, curve in self.joint_velocities.items():
+            num_frames = len(curve)
+
+            # fractional index
+            frame_idx = sampling_times * animation_fps
+
+            # wrap animation
+            frame_idx = frame_idx % num_frames
+
+            # get the frames to the left and right
+            i0 = frame_idx.floor().long()
+            i1 = (i0 + 1) % num_frames
+
+            # interpolation weight
+            weights = frame_idx - i0
+
+            # linear interpolate
+            joint_targets = (1 - weights) * curve[i0] + weights * curve[i1]
+
+            # get the current joint positions
+            joint_index = asset.find_joints([joint_name])[0]
+            #current_pos = asset.data.joint_pos[:, joint_index].squeeze()
+            current_pos = mdp.joint_vel_rel(env)[:, joint_index].squeeze()
+
+            # calculate penalty for diverging from the expected joint velocity
+            reward = torch.square(current_pos - joint_targets)
+            rewards.append(self.tracking_weight[joint_name] * reward)
+        
+        #interestingly, the reward term seems to be shape (num_envs, ), not (num_envs, 1)
+        total_reward = torch.stack(rewards, dim = -1).sum(-1)
+        return total_reward

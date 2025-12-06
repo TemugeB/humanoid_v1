@@ -26,8 +26,8 @@ joints = [
 ]
 
 usd_path = "/home/temuge/isaac_projects/humanoid_v1/robot_model/robot/humanoid.usd"
-usd_path = '/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd'
-animation_fps = 70
+#usd_path = '/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd'
+animation_fps = 74
 num_frames = 135
 
 HUMANOID_CONFIG = ArticulationCfg(
@@ -145,8 +145,8 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
         terrain_type="plane",
         collision_group=-1,
         physics_material=sim_utils.RigidBodyMaterialCfg(
-            friction_combine_mode="average",
-            restitution_combine_mode="average",
+            friction_combine_mode="max",
+            restitution_combine_mode="max",
             static_friction=10.0,
             dynamic_friction=10.0,
             restitution=0.5,
@@ -278,13 +278,14 @@ class RewardsCfg:
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-6)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-.5)
     animation_tracking = RewTerm(func=mdp.joint_angle_tracking, weight = -4.0, params = {'animation_fps': animation_fps})
+    joint_velocity_tracking = RewTerm(func=mdp.joint_velocity_tracking, weight = -0.1, params = {'animation_fps': animation_fps})
     move_to_target = RewTerm(func=mdp.move_to_target_bonus, weight=1.0, params={"threshold": 0.9, "target_pos": (1000.0, 0.0, 0.0)})
-    feet_contact_tracking = RewTerm(func=mdp.feet_contact_tracking, weight = -0.3, params = {'animation_fps': animation_fps, 'num_frames': num_frames})
+    feet_contact_tracking = RewTerm(func=mdp.feet_contact_tracking, weight = -0.5, params = {'animation_fps': animation_fps, 'num_frames': num_frames})
     #compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 5e-2})
     
-    # feet_slide = RewTerm(func=mdp.feet_slide, weight = -0.1, params={
-    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
-    #         "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
+    feet_slide = RewTerm(func=mdp.feet_slide, weight = -1.5, params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
+            "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
     
 
 @configclass
