@@ -281,6 +281,9 @@ class RewardsCfg:
     joint_velocity_tracking = RewTerm(func=mdp.joint_velocity_tracking, weight = -0.1, params = {'animation_fps': animation_fps})
     move_to_target = RewTerm(func=mdp.move_to_target_bonus, weight=1.0, params={"threshold": 0.9, "target_pos": (1000.0, 0.0, 0.0)})
     feet_contact_tracking = RewTerm(func=mdp.feet_contact_tracking, weight = -0.5, params = {'animation_fps': animation_fps, 'num_frames': num_frames})
+    xy_angular_vel = RewTerm(func=mdp.ang_vel_xy_l2, weight = -5e-1)
+    flat_orientation = RewTerm(func=mdp.flat_orientation_l2, weight = -1.0)
+    lateral_movement = RewTerm(func=mdp.lateral_motion, weight = -0.1)
     #compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 5e-2})
     
     feet_slide = RewTerm(func=mdp.feet_slide, weight = -1.5, params={

@@ -646,14 +646,6 @@ class feet_contact_tracking(ManagerTermBase):
         foot_contact_tracking_penalty = left_illegal_foot_contact + right_illegal_foot_contact
         return foot_contact_tracking_penalty.squeeze()
 
-def clipped_base_forward_motion(env, threshold: float):
-
-    #get the current forward motion of all envs
-    lin_vel = mdp.base_lin_vel(env)
-    print(lin_vel)
-
-    return torch.zeros((env.num_envs), device=env.device)
-
 class joint_velocity_tracking(ManagerTermBase):
 
     def __init__(self, env: ManagerBasedRLEnv, cfg: RewardTermCfg):
@@ -730,3 +722,10 @@ class joint_velocity_tracking(ManagerTermBase):
         #interestingly, the reward term seems to be shape (num_envs, ), not (num_envs, 1)
         total_reward = torch.stack(rewards, dim = -1).sum(-1)
         return total_reward
+
+def lateral_motion(env, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")):
+    
+    asset : Articulation = env.scene[asset_cfg.name]
+    vel_base = asset.data.root_com_lin_vel_b
+    lateral_vel = vel_base[:, 1].reshape(-1)
+    return torch.abs(lateral_vel)
