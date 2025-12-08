@@ -26,8 +26,8 @@ joints = [
 ]
 
 usd_path = "/home/temuge/isaac_projects/humanoid_v1/robot_model/robot/humanoid.usd"
-usd_path = '/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd'
-animation_fps = 85
+#usd_path = '/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd'
+animation_fps = 90
 num_frames = 135
 
 HUMANOID_CONFIG = ArticulationCfg(
@@ -286,7 +286,7 @@ class RewardsCfg:
     lateral_movement = RewTerm(func=mdp.lateral_motion, weight = -0.5)
     #compound_reward = RewTerm(func=mdp.compound_reward, weight = 1.0, params = {'threshold': 5e-2})
     
-    feet_slide = RewTerm(func=mdp.feet_slide, weight = -2.5, params={
+    feet_slide = RewTerm(func=mdp.feet_slide, weight = -1.5, params={
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["shoes", "shoes_2"]),
             "asset_cfg": SceneEntityCfg("robot", body_names=["shoes", "shoes_2"]) })
     

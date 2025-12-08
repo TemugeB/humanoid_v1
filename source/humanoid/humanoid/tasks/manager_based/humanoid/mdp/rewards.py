@@ -602,7 +602,7 @@ class feet_contact_tracking(ManagerTermBase):
         self.left_nocontact_mask = torch.zeros((num_frames), dtype=torch.int32, device = env.device)
         self.left_nocontact_mask[left_no_contact_frames] = 1
 
-        right_no_contact_frames = list(range(20)) + list(range(120, 135))
+        right_no_contact_frames = list(range(18)) + list(range(121, 135))
         self.right_nocontact_mask = torch.zeros((num_frames), dtype=torch.int32, device = env.device)
         self.right_nocontact_mask[right_no_contact_frames] = 1
 

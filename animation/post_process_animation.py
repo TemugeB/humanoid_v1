@@ -110,6 +110,45 @@ def calculate_joint_velocity(joint_rotations):
     return joint_velocities
 
 
+def copy_leg_rotatioins(joint_rotations):
+
+    hip_left_copy = joint_rotations['hip_left_y']
+    hip_left_copy = np.roll(hip_left_copy, 135//2)
+    # plt.plot(joint_rotations['hip_left_y'], label = 'left')
+    # plt.plot(joint_rotations['hip_right_y'], label = 'right')
+    # plt.plot(-hip_left_copy, label = 'copy')
+    # plt.legend()
+    # plt.show()    
+
+    knee_left_copy = joint_rotations['knee_left']
+    knee_left_copy = np.roll(knee_left_copy, 135//2)
+    # plt.plot(joint_rotations['knee_left'], label = 'left')
+    # plt.plot(joint_rotations['knee_right'], label = 'right')
+    # plt.plot(-knee_left_copy, label = 'copy')
+    # plt.legend()
+    # plt.show()    
+
+    joint_rotations['hip_right_y'] = -hip_left_copy
+    joint_rotations['knee_right'] = -knee_left_copy
+    return joint_rotations
+
+
+def modify_joints(joint_rotations):
+
+    #reduce the spine motion
+    spine_rots = joint_rotations['spine']
+    # plt.plot(joint_rotations['spine'], label='spine')
+    # plt.plot(0.25 * spine_rots, label='reduced')
+    # plt.legend()
+    # plt.show()
+    joint_rotations['spine'] = 0.25 * spine_rots
+
+    #reduce side stepping
+    joint_rotations['hip_left_x'] = 0.25 * joint_rotations['hip_left_x']
+    joint_rotations['hip_right_x'] = 0.25 * joint_rotations['hip_right_x']
+
+    return joint_rotations
+
 #apply exp smoothing
 smoothed_rotations = apply_smoothing(joint_rotations, alpha=0.9)
 
@@ -119,12 +158,15 @@ for joint_name, joint_traj in joint_rotations.items():
     upsampled_rotations[joint_name] = upsample_traj(joint_traj, factor=3)
 blended_rotations = blend_for_looping(upsampled_rotations)
 
-joint_ = 'hip_left_z'
-plt.plot(joint_rotations[joint_], label = 'raw')
-plt.plot(blended_rotations[joint_][::3], label = 'smoothed + blended')
+# joint_ = 'hip_left_z'
+# plt.plot(joint_rotations[joint_], label = 'raw')
+# plt.plot(blended_rotations[joint_][::3], label = 'smoothed + blended')
 
-plt.legend()
-plt.show()
+# plt.legend()
+# plt.show()
+
+blended_rotations = modify_joints(blended_rotations)
+blended_rotations = copy_leg_rotatioins(blended_rotations)
 
 blended_anim = {key: traj[::3] for key, traj in blended_rotations.items()}
 
@@ -151,7 +193,7 @@ with open("postprocessed_joint_velocities.pkl", "wb") as f:
     pickle.dump(blended_velocities, f)
 
 joint_ = 'hip_left_y'
-plt.plot(blended_velocities[joint_][::3], label = 'joint_velocity')
+plt.plot(blended_velocities[joint_], label = 'joint_velocity')
 
 plt.legend()
 plt.show()
