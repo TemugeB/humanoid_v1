@@ -27,7 +27,7 @@ joints = [
 
 usd_path = "/home/temuge/isaac_projects/humanoid_v1/robot_model/robot/humanoid.usd"
 #usd_path = '/home/temuge/isaac_projects/my_bots/humanoid_urdf/robot/humanoid.usd'
-animation_fps = 80
+animation_fps = 90
 num_frames = 135
 
 HUMANOID_CONFIG = ArticulationCfg(
@@ -147,8 +147,8 @@ class HumanoidSceneCfg(InteractiveSceneCfg):
         physics_material=sim_utils.RigidBodyMaterialCfg(
             friction_combine_mode="max",
             restitution_combine_mode="max",
-            static_friction=10.0,
-            dynamic_friction=10.0,
+            static_friction=25.0,
+            dynamic_friction=25.0,
             restitution=0.5,
         ),
         visual_material = sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0)),
@@ -272,15 +272,15 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    progress = RewTerm(func=mdp.progress_reward, weight=1.0, params={"target_pos": (1000.0, 0.0, 0.0)})
+    progress = RewTerm(func=mdp.progress_reward, weight=0.85, params={"target_pos": (1000.0, 0.0, 0.0)})
     alive = RewTerm(func=mdp.is_alive, weight=10.0)
     torque_usage = RewTerm(func=mdp.joint_torques_l2, weight=-5e-4)
     joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-1e-6)
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-.5)
     animation_tracking = RewTerm(func=mdp.joint_angle_tracking, weight = -4.0, params = {'animation_fps': animation_fps})
-    joint_velocity_tracking = RewTerm(func=mdp.joint_velocity_tracking, weight = -0.1, params = {'animation_fps': animation_fps})
+    joint_velocity_tracking = RewTerm(func=mdp.joint_velocity_tracking, weight = -0.3, params = {'animation_fps': animation_fps})
     move_to_target = RewTerm(func=mdp.move_to_target_bonus, weight=1.0, params={"threshold": 0.9, "target_pos": (1000.0, 0.0, 0.0)})
-    feet_contact_tracking = RewTerm(func=mdp.feet_contact_tracking, weight = -0.5, params = {'animation_fps': animation_fps, 'num_frames': num_frames})
+    feet_contact_tracking = RewTerm(func=mdp.feet_contact_tracking, weight = -0.1, params = {'animation_fps': animation_fps, 'num_frames': num_frames})
     xy_angular_vel = RewTerm(func=mdp.ang_vel_xy_l2, weight = -5e-1)
     flat_orientation = RewTerm(func=mdp.flat_orientation_l2, weight = -0.1)
     lateral_movement = RewTerm(func=mdp.lateral_motion, weight = -0.1)
@@ -324,7 +324,7 @@ class HumanoidEnvCfg(ManagerBasedRLEnvCfg):
         """Post initialization."""
         # general settings
         self.decimation = 4
-        self.episode_length_s = 8.0
+        self.episode_length_s = 6.0
         # viewer settings
         self.viewer.eye = (8.0, 0.0, 5.0)
         # simulation settings

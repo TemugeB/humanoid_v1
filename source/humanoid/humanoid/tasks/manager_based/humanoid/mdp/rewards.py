@@ -708,15 +708,17 @@ class joint_velocity_tracking(ManagerTermBase):
             weights = frame_idx - i0
 
             # linear interpolate
-            joint_targets = (1 - weights) * curve[i0] + weights * curve[i1]
+            joint_v_targets = (1 - weights) * curve[i0] + weights * curve[i1]
+            # to seconds
+            joint_v_targets *= animation_fps
 
             # get the current joint positions
             joint_index = asset.find_joints([joint_name])[0]
             #current_pos = asset.data.joint_pos[:, joint_index].squeeze()
-            current_pos = mdp.joint_vel_rel(env)[:, joint_index].squeeze()
+            current_rot_vel = mdp.joint_vel_rel(env)[:, joint_index].squeeze()
 
             # calculate penalty for diverging from the expected joint velocity
-            reward = torch.square(current_pos - joint_targets)
+            reward = torch.square(current_rot_vel - joint_v_targets)
             rewards.append(self.tracking_weight[joint_name] * reward)
         
         #interestingly, the reward term seems to be shape (num_envs, ), not (num_envs, 1)
